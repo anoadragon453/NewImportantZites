@@ -1,0 +1,52 @@
+{
+    "categories": [
+        {
+            "id": 0,
+            "name": "Search Engine",
+            "slug": "search-engine",
+            "tags": ""
+        },
+        {
+            "id": 1,
+            "name": "Social Network",
+            "slug": "social-network",
+            "tags": "forum,board,chat"
+        },
+        {
+            "id": 2,
+            "name": "Gaming",
+            "slug": "gaming",
+            "tags": ""
+        },
+        {
+            "id": 3,
+            "name": "Blog",
+            "slug": "blog",
+            "tags": ""
+        },
+        {
+            "id": 4,
+            "name": "File Sharing/Streaming",
+            "slug": "file-sharing-streaming",
+            "tags": "video,audio,images,photos,books,ebooks,music,torrents"
+        },
+        {
+            "id": 5,
+            "name": "News/Info",
+            "slug": "news-info",
+            "tags": "tutorials,guides,politics"
+        },
+        {
+            "id": 6,
+            "name": "Productivity",
+            "slug": "productivity",
+            "tags": "todo,note-taking,notes"
+        },
+        {
+            "id": 7,
+            "name": "Other",
+            "slug": "other",
+            "tags": ""
+        }
+    ]
+}
