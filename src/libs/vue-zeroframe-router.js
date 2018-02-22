@@ -67,6 +67,7 @@ function VueZeroFrameRouter_Init(Router, vueInstance, routes) {
 	Router.vueInstance = vueInstance;
 	Router.setView = function(i, object) {
 		this.vueInstance.currentView = object;
+		vueInstance.$mount();
 		//this.vueInstance.$forceUpdate();
 	}
 	Router.init();

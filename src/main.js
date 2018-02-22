@@ -116,7 +116,16 @@ class ZeroApp extends ZeroFrame {
 		return page.cmdp("dbQuery", [query]);
 	}
 
-	addZite(title, description, tags, category_slug, merger_supported, merger_slug) {
+	getZites() {
+		var query = `
+			SELECT * FROM zites
+			LEFT JOIN json USING (json_id)
+			`;
+		return page.cmdp("dbQuery", [query]);
+	}
+
+	// merger_supported :: bool
+	addZite(title, creator, description, tags, category_slug, merger_supported, merger_category, beforePublishCB) {
 		if (!this.siteInfo.cert_user_id) {
     		return this.cmdp("wrapperNotification", ["error", "You must be logged in to add a zite."]);
     	}
@@ -136,16 +145,18 @@ class ZeroApp extends ZeroFrame {
 
 				var date = Date.now();
 				
-				var slug = title; // TODO
+				var slug = title.toLowerCase().replace(/\s*/g, "_").replace(/(\.|\:)/g, "-").replace(/[^a-zA-Z0-9-]/g, "");
 
     			data["zites"].push({
     				"zite_id": date,
 					"title": title,
+					"creator": creator,
 					"slug": slug,
 					"description": description,
+					"category_slug": category_slug,
 					"tags": tags,
 					"merger_supported": merger_supported,
-					"merger_slug": merger_slug,
+					"merger_category": merger_category,
     				"date_added": date
     			});
 
