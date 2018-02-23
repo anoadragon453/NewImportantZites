@@ -24,7 +24,7 @@
 			        		</div>
 
                             <div class="input-field">
-			        			<input id="creator" v-model="creator" type="text" class="validate" required>
+			        			<input id="creator" v-model="creator" v-on:changed="creatorChanged()" type="text" class="validate" required>
 			        			<label for="creator">Zite Creator/Maintainer *</label>
 			        		</div>
 
@@ -192,6 +192,9 @@
 			},
 			titleChanged: function() {
 				this.title = this.title.replace(/((https?|zero|zeronet)\:\/\/|(127\.0\.0\.1|192\.168\.0\.[0-9]+)(\:[0-9]+)?\/?|localhost|.*(\.(com|net|org|tk|uk|eu|co))+(\:[0-9]+)?\/?|zero\/)/g, "").replace(/(\?|#)\/?$/, "").replace(/\.bit/g, "").replace(/(#.*|\?.*)/g, "").replace(/\/$/g, "");
+			},
+			creatorChanged: function() {
+				this.creator = this.creator.replace(/(.)@.*$/g, "$1");
 			},
 			mergerCategoryChanged: function() {
 				this.mergerCategory = this.mergerCategory.replace(/(merger|merged)-/g, "");
