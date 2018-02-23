@@ -1,40 +1,40 @@
 <template>
-	<div id="AddZite" class="container">
+	<div id="EditZite" class="container">
 		<div class="row">
 	        <div class="col s12 m12 l9">
 	        	<!--<component :is="topic_navbar" active="ask" :user-info="userInfo"></component>-->
 	        	<div class="card">
 	        		<div class="card-content">
-	        			<span class="card-title">Add New Zite</span>
+	        			<span class="card-title">Edit Zite</span>
 		        		<!-- Using form so I can get html5 form validation -->
-		        		<form v-on:submit.prevent="addZite()">
+		        		<form v-on:submit.prevent="editZite()">
 			        		<div class="input-field">
-			        			<input id="title" v-model="title" type="text" class="validate" v-on:change="titleChanged()" required>
+			        			<input ref="title" id="title" v-model="title" type="text" class="validate" v-on:change="titleChanged()" required>
 			        			<label for="title">Title *</label>
 			        		</div>
 
 			        		<div class="input-field">
-			        			<input id="address" v-model="address" type="text" class="validate" v-on:change="addressChanged()" required>
+			        			<input ref="address" id="address" v-model="address" type="text" class="validate" v-on:change="addressChanged()" required>
 			        			<label for="address">Zite Address * (Not .bit Domain)</label>
 			        		</div>
 
 			        		<div class="input-field">
-			        			<input id="domain" v-model="domain" type="text" class="validate" v-on:change="domainChanged()">
+			        			<input ref="domain" id="domain" v-model="domain" type="text" class="validate" v-on:change="domainChanged()">
 			        			<label for="domain">Zite .bit Domain (if exists)</label>
 			        		</div>
 
                             <div class="input-field">
-			        			<input id="creator" v-model="creator" v-on:changed="creatorChanged()" type="text" class="validate" required>
+			        			<input ref="creator" id="creator" v-model="creator" v-on:changed="creatorChanged()" type="text" class="validate" required>
 			        			<label for="creator">Zite Creator/Maintainer *</label>
 			        		</div>
 
 			        		<div class="input-field">
-			        			<textarea id="description" class="materialize-textarea validate" required v-model="description"></textarea>
+			        			<textarea ref="description" id="description" class="materialize-textarea validate" required v-model="description"></textarea>
 			        			<label for="description">Description *</label>
 			        		</div>
 
                             <div class="input-field col s12">
-                                <select id="categoryselect"  ref="categoryselect" v-model="category" v-on:change="updateTagsAutocompletion" required>
+                                <select id="categoryselect"  ref="categoryselect" v-model="category" :value="category" v-on:change="updateTagsAutocompletion" required>
                                     <option value="" disabled selected>Choose your option</option>
                                     <option v-for="category in categories" :value="category.slug">{{ category.name }}</option>
                                 </select>
@@ -88,15 +88,17 @@
 
 	module.exports = {
 		props: ["userInfo"],
-		name: "AddZite",
+		name: "EditZite",
 		data: () => {
 			return {
 				submitBtnDisabled: false,
+				id: 0,
 				title: "",
 				address: "",
 				domain: "",
                 creator: "",
-				description: "",
+                description: "",
+                ziteTags: "",
 				tagsInstance: null,
 				categorySelect_instance: null,
 				mergerCategory_instance: null,
@@ -109,61 +111,105 @@
 			}
 		},
 		beforeMount: function() {
-            var self = this;
-            page.getCategories()
-                .then((categories) => {
-                    self.categories = categories;
-				});
-			page.getMergerCategoryNames()
-				.then((names) => {
-					console.log(names);
-					self.mergerCategoryNames = names;
-				});
+			this.getInfo(this.userInfo);
+
+			this.$parent.$on('setuserinfo', this.getInfo);
 		},
 		updated: function() {
-			var tags = this.$refs.tags;
-			if (!this.tagsInstance) {
-				var autocompleteData = {};
-				for (i in this.categories) {
-					var category_tags = this.categories[i].tags.split(",");
-					for (j in category_tags) {
-						var tag = category_tags[j];
-						if (!autocompleteData[tag]) autocompleteData[tag] = null;
-					}
-				}
-				this.tagsInstance = M.Chips.init(tags, {
-					placeholder: "Enter tags",
-					secondaryPlaceholder: "+Tag",
-					autocompleteOptions: {
-						data: autocompleteData,
-						limit: Infinity
-					}
-				});
-			}
-
-			if (!this.categorySelect_instance) {
-				var categorySelect = this.$refs.categoryselect;
-				this.categorySelect_instance = M.FormSelect.init(categorySelect, {});
-			}
-
-			//if (!this.mergerCategory_instance) {
-				var autocompleteData = {};
-				//console.log(this.mergerCategoryNames);
-				for (row in this.mergerCategoryNames) {
-					autocompleteData[this.mergerCategoryNames[row].merger_category] = null;
-				}
-				
-				var mergerCategory = this.$refs.mergercategory;
-				this.mergerCategory_instance = M.Autocomplete.init(mergerCategory, {
-					data: autocompleteData
-				});
-			//}
+			this.updateFields();
 		},
 		methods: {
+			getInfo: function(userInfo) {
+				var self = this;
+				page.getCategories()
+					.then((categories) => {
+						self.categories = categories;
+
+						if (!userInfo || !userInfo.auth_address) return; // Not logged in
+						return page.getZite(userInfo.auth_address, Router.currentParams["ziteid"]);
+					}).then((zites) => {
+						var zite = zites[0];
+						self.id = zite.id;
+						self.title = zite.title;
+						self.address = zite.address;
+						self.domain = zite.domain;
+						self.creator = zite.creator;
+						self.description = zite.description;
+						self.mergerCategory = zite.merger_category;
+						self.mergerSupported = zite.merger_supported;
+						self.category = zite.category_slug;
+						self.ziteTags = zite.tags;
+
+						M.updateTextFields(); // TODO: Not working
+
+						//self.tagsInstance.addChip();
+						var tags = self.ziteTags.split(",");
+						if (tags[0] == "nsfw") {
+							self.nsfw = true;
+							tags = tags.splice(0, 1);
+						}
+
+						for (var i in tags) {
+							self.tagsInstance.addChip({
+								tag: tags[i]
+							});
+						}
+
+						self.updateTagsAutocompletion();
+
+						var categoryName = "";
+						for (var i in self.categories) {
+							if (self.categories[i].slug == self.category) {
+								categoryName = self.categories[i].name;
+								break;
+							}
+						}
+						var categorySelect = self.$refs.categoryselect;
+						self.categorySelect_instance = M.FormSelect.init(categorySelect, {});
+						self.categorySelect_instance.input.value = categoryName;
+
+						var autocompleteData = {};
+						for (row in self.mergerCategoryNames) {
+							autocompleteData[self.mergerCategoryNames[row].merger_category] = null;
+						}
+						
+						var mergerCategory = self.$refs.mergercategory;
+						self.mergerCategory_instance = M.Autocomplete.init(mergerCategory, {
+							data: autocompleteData
+						});
+						self.$forceUpdate();
+					});
+				page.getMergerCategoryNames()
+					.then((names) => {
+						self.mergerCategoryNames = names;
+					});
+			},
+			updateFields: function(force = false) {
+				var tags = this.$refs.tags;
+				if (!this.tagsInstance || force) {
+					// Autocompletion data
+					var autocompleteData = {};
+					for (i in this.categories) {
+						var category_tags = this.categories[i].tags.split(",");
+						for (j in category_tags) {
+							var tag = category_tags[j];
+							if (!autocompleteData[tag]) autocompleteData[tag] = null;
+						}
+					}
+					this.tagsInstance = M.Chips.init(tags, {
+						placeholder: "Enter tags",
+						secondaryPlaceholder: "+Tag",
+						autocompleteOptions: {
+							data: autocompleteData,
+							limit: Infinity
+						}
+					});
+				}
+			},
 			goto: function(to) {
 				Router.navigate(to);
 			},
-            addZite: function() {
+            editZite: function() {
                 if (!this.userInfo || !this.userInfo.auth_address) {
 					page.cmdp("wrapperNotification", ["info", "Please login first."]);
 					page.selectUser();
@@ -184,7 +230,7 @@
 					tags = "nsfw," + tags;
 				}
 
-                page.addZite(this.title, this.address, this.domain, this.creator, this.description, tags, this.category, this.mergerSupported, this.mergerCategory, () => {
+                page.editZite(this.id, this.title, this.address, this.domain, this.creator, this.description, tags, this.category, this.mergerSupported, this.mergerCategory, () => {
 					Router.navigate("");
 				});
 			},
