@@ -8,7 +8,7 @@
 	        		<a class="collection-item center-align" v-for="category in categories" :class="{ 'active': isActive(category.slug) }" :href="'./?/category/' + category.slug">{{ category.name }}</a>
 	        	</ul>
 	        	<div class="center-align">
-	        		<a href="./?/request-category" v-on:click.prevent="goto('request-category')">Request New Category</a> <!-- TODO -->
+	        		<a href="/Mail.ZeroNetwork.bit/?to=krixano">Request New Category (ZeroMail)</a> <!-- TODO -->
 	        	</div>
 	        </div>
         </div>
