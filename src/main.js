@@ -116,16 +116,31 @@ class ZeroApp extends ZeroFrame {
 		return page.cmdp("dbQuery", [query]);
 	}
 
-	getZites() {
+	getZites(pageNum = 0, limit = 8) {
+		const offset = pageNum * limit;
 		var query = `
 			SELECT * FROM zites
 			LEFT JOIN json USING (json_id)
+			LIMIT ${limit}
+			OFFSET ${offset}
+			`;
+		return page.cmdp("dbQuery", [query]);
+	}
+
+	getZitesInCategory(categorySlug, pageNum = 0, limit = 8) {
+		const offset = pageNum * limit;
+		var query = `
+			SELECT * FROM zites
+			LEFT JOIN json USING (json_id)
+			WHERE category_slug="${categorySlug}"
+			LIMIT ${limit}
+			OFFSET ${offset}
 			`;
 		return page.cmdp("dbQuery", [query]);
 	}
 
 	// merger_supported :: bool
-	addZite(title, creator, description, tags, category_slug, merger_supported, merger_category, beforePublishCB) {
+	addZite(title, address, domain, creator, description, tags, category_slug, merger_supported, merger_category, beforePublishCB) {
 		if (!this.siteInfo.cert_user_id) {
     		return this.cmdp("wrapperNotification", ["error", "You must be logged in to add a zite."]);
     	}
@@ -147,9 +162,13 @@ class ZeroApp extends ZeroFrame {
 				
 				var slug = title.toLowerCase().replace(/\s*/g, "_").replace(/(\.|\:)/g, "-").replace(/[^a-zA-Z0-9-]/g, "");
 
+				address = address.replace(/((https?|zero|zeronet)\:\/\/|(127\.0\.0\.1|192\.168\.0\.[0-9]+)(\:[0-9]+)?\/?|localhost|.*(\.(com|net|org|tk|uk|eu|co))+(\:[0-9]+)?\/?|zero\/)/g, "").replace(/(\?|#)\/?$/, "").replace(/\/$/g, "");
+
     			data["zites"].push({
     				"zite_id": date,
 					"title": title,
+					"address": address,
+					"domain": domain,
 					"creator": creator,
 					"slug": slug,
 					"description": description,
@@ -193,9 +212,11 @@ page = new ZeroApp();
 var Home = require("./router_pages/home.vue");
 var About = require("./router_pages/about.vue");
 var AddZite = require("./router_pages/add-zite.vue");
+var CategoryPage = require("./router_pages/categoryPage.vue");
 
 VueZeroFrameRouter.VueZeroFrameRouter_Init(Router, app, [
 	{ route: "about", component: About },
 	{ route: "add-zite", component: AddZite },
+	{ route: "category/:categoryslug", component: CategoryPage },
 	{ route: "", component: Home }
 ]);

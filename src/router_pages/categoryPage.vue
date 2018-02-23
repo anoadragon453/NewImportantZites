@@ -1,5 +1,5 @@
 <template>
-	<div id="mainapp" class="container">
+	<div id="categoryPage" class="container">
 		<div class="row">
 	        <div class="col s12 m7 l9">
 
@@ -15,7 +15,7 @@
 					</div>
 				</nav>
 
-				<ul class="pagination" v-if="zites.length >= 4">
+                <ul class="pagination" v-if="zites.length != 0">
 					<li><a href="#!" v-on:click.prevent="previousPage"><i class="material-icons">chevron_left</i></a></li>
 					<li class="disabled"><a href="#!">{{ pageNum + 1 }}</a></li>
 					<li><a href="#!" v-on:click.prevent="nextPage"><i class="material-icons">chevron_right</i></a></li>
@@ -25,8 +25,7 @@
 	        	<div class="divider"></div>-->
 				<component :is="zite_list_item" :user-info="userInfo" v-for="zite in zites" :zite="zite" :show-category="true" :categories="categories"></component>
 
-
-				<!-- TODO: Use getSearchResults when check for length once search has been implemented -->
+                <!-- TODO: Use getSearchResults when check for length once search has been implemented -->
 				<div style="margin-left: auto; margin-right: auto;">
 					<ul class="pagination" v-if="zites.length != 0">
 						<li><a href="#!" v-on:click.prevent="previousPage"><i class="material-icons">chevron_left</i></a></li>
@@ -49,21 +48,21 @@
 
 	module.exports = {
 		props: ["userInfo"],
-		name: "mainapp",
+		name: "categoryPage",
 		data: () => {
 			return {
 				categoriesSidebar: categoriesSidebar,
 				zite_list_item: ziteListItem,
 				zites: [],
-				categories: [],
-				pageNum: 0
+                categories: [],
+                pageNum: 0
 			}
 		},
 		beforeMount: function() {
-			var self = this;
+            var self = this;
 
-			if (Router.currentParams["page"])
-				this.pageNum = parseInt(Router.currentParams["page"]);
+            if (Router.currentParams["page"])
+                this.pageNum = parseInt(Router.currentParams["page"]);
 
 			this.getZites();
 			this.getCategories();
@@ -85,17 +84,17 @@
 			},
 			getZites: function() {
 				var self = this;
-				page.getZites(this.pageNum)
+				page.getZitesInCategory(Router.currentParams["categoryslug"], this.pageNum)
 					.then((zites) => {
-						if (zites.length == 0 && self.pageNum != 0) {
+                        if (zites.length == 0 && self.pageNum != 0) {
 							self.pageNum--;
 							self.getZites();
 							return;
 						}
 						self.zites = zites;
 					});
-			},
-			previousPage: function() { // TODO: Scroll to top
+            },
+            previousPage: function() { // TODO: Scroll to top
 				this.pageNum -= 1;
 				if (this.pageNum <= 0) this.pageNum = 0;
 				this.getZites();
@@ -103,7 +102,7 @@
 			nextPage: function() {
 				this.pageNum += 1;
 				this.getZites();
-			}	/*,
+			} /*,
 			getQuestions: function() {
                 var self = this;
 

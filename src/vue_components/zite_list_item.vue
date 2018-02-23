@@ -2,14 +2,14 @@
 	<div class="card" id="zite-list-item">
 		<div class="card-content">
 			<span class="card-title">
-				<a href="#">{{ zite.title }}</a>
+				<a :href="'/' + (zite.domain || zite.address)">{{ zite.title }}</a>
 			</span>
 			<p> <!-- limit text amount in some way, truncate? -->
 				{{ zite.description }}
 			</p>
             <!-- Add Zite Creator -->
 			<small>
-                Published {{ getDate }} <span>by <a href="#">{{ getName }}</a><span v-if="showCategory"> in <a href="#">{{ getCategoryName }}</a></span></span><br>
+                <!--Published {{ getDate }} <span>by <a href="#">{{ getName }}</a><span v-if="showCategory"> in <a href="#">{{ getCategoryName }}</a></span></span><br>-->
                 Created by <a href="#">{{ zite.creator }}</a>
             </small>
 		</div>
@@ -21,7 +21,7 @@
 	var Router = require("../libs/router.js");
 
 	module.exports = {
-		props: ["userInfo", "zite", "showCategory"],
+		props: ["userInfo", "zite", "showCategory", "categories"],
 		name: "zite-list-item",
 		computed: {
 			getName: function() {
@@ -36,7 +36,13 @@
 				return this.zite.directory.replace(/data\/users\//, "").replace(/\//g, "");
 			},
 			getCategoryName: function() {
-				return this.zite.category_slug;
+				if (!this.categories || this.categories.length == 0) return this.zite.category_slug;
+				for (category of this.categories) {
+					if (this.zite.category_slug == category.slug) {
+						return category.name;
+					}
+				}
+				return "[UNKNOWN]";
 			},
 			userIsOwner: function() {
 				if (!this.userInfo) return false;

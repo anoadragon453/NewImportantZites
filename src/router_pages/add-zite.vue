@@ -9,8 +9,18 @@
 		        		<!-- Using form so I can get html5 form validation -->
 		        		<form v-on:submit.prevent="addZite()">
 			        		<div class="input-field">
-			        			<input id="title" v-model="title" type="text" class="validate" required>
+			        			<input id="title" v-model="title" type="text" class="validate" v-on:change="titleChanged()" required>
 			        			<label for="title">Title *</label>
+			        		</div>
+
+			        		<div class="input-field">
+			        			<input id="address" v-model="address" type="text" class="validate" v-on:change="addressChanged()" required>
+			        			<label for="address">Zite Address * (Not .bit Domain)</label>
+			        		</div>
+
+			        		<div class="input-field">
+			        			<input id="domain" v-model="domain" type="text" class="validate" v-on:change="domainChanged()" required>
+			        			<label for="domain">Zite .bit Domain (if exists)</label>
 			        		</div>
 
                             <div class="input-field">
@@ -83,6 +93,8 @@
 			return {
 				submitBtnDisabled: false,
 				title: "",
+				address: "",
+				domain: "",
                 creator: "",
 				description: "",
 				tagsInstance: "",
@@ -132,11 +144,20 @@
 					tags = "nsfw," + tags;
 				}
 
-                page.addZite(this.title, this.creator, this.description, tags, this.category, this.mergerSupported, this.mergerCategory)
+                page.addZite(this.title, this.address, this.domain, this.creator, this.description, tags, this.category, this.mergerSupported, this.mergerCategory)
                     .then(() => {
                         Router.navigate('');
                     });
-            }
+			},
+			addressChanged: function() {
+				this.address = this.address.replace(/((https?|zero|zeronet)\:\/\/|(127\.0\.0\.1|192\.168\.0\.[0-9]+)(\:[0-9]+)?\/?|localhost|.*(\.(com|net|org|tk|uk|eu|co|bit))+(\:[0-9]+)?\/?|zero\/)/g, "").replace(/(\?|#)\/?$/, "").replace(/\/$/g, "");
+			},
+			domainChanged: function() {
+				this.domain = this.domain.replace(/((https?|zero|zeronet)\:\/\/|(127\.0\.0\.1|192\.168\.0\.[0-9]+)(\:[0-9]+)?\/?|localhost|.*(\.(com|net|org|tk|uk|eu|co))+(\:[0-9]+)?\/?|zero\/)/g, "").replace(/(\?|#)\/?$/, "").replace(/\/$/g, "");
+			},
+			titleChanged: function() {
+				this.title = this.title.replace(/((https?|zero|zeronet)\:\/\/|(127\.0\.0\.1|192\.168\.0\.[0-9]+)(\:[0-9]+)?\/?|localhost|.*(\.(com|net|org|tk|uk|eu|co))+(\:[0-9]+)?\/?|zero\/)/g, "").replace(/(\?|#)\/?$/, "").replace(/\.bit/g, "").replace(/(#.*|\?.*)/g, "").replace(/\/$/g, "");
+			}
 		}
 	}
 </script>
