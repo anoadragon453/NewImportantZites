@@ -5,9 +5,9 @@
 
 				<nav style="background-color: #1976D2; margin-bottom: 10px; margin-top: 8px;">
 					<div class="nav-wrapper">
-					<form>
+					<form onsubmit="return false;">
 						<div class="input-field">
-						<input id="search" type="search" placeholder="Search" required>
+						<input id="search" type="search" placeholder="Search (On Enter)" v-on:search="getZites()" v-model="searchQuery" required>
 						<label class="label-icon" for="search"><i class="material-icons">search</i></label>
 						<i class="material-icons">close</i>
 						</div>
@@ -15,7 +15,7 @@
 					</div>
 				</nav>
 
-                <ul class="pagination" v-if="zites.length != 0">
+                <ul class="pagination" v-if="zites.length >= 4">
 					<li><a href="#!" v-on:click.prevent="previousPage"><i class="material-icons">chevron_left</i></a></li>
 					<li class="disabled"><a href="#!">{{ pageNum + 1 }}</a></li>
 					<li><a href="#!" v-on:click.prevent="nextPage"><i class="material-icons">chevron_right</i></a></li>
@@ -55,7 +55,8 @@
 				zite_list_item: ziteListItem,
 				zites: [],
                 categories: [],
-                pageNum: 0
+                pageNum: 0,
+                searchQuery: ""
 			}
 		},
 		beforeMount: function() {
@@ -84,7 +85,7 @@
 			},
 			getZites: function() {
 				var self = this;
-				page.getZitesInCategory(Router.currentParams["categoryslug"], this.pageNum)
+				page.getZitesInCategorySearch(Router.currentParams["categoryslug"], this.searchQuery, this.pageNum)
 					.then((zites) => {
                         if (zites.length == 0 && self.pageNum != 0) {
 							self.pageNum--;

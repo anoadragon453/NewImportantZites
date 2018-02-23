@@ -56,7 +56,7 @@
                                 </label>
                             </div>
                             <div class="input-field">
-			        			<input id="mergerCategory" v-model="mergerCategory" type="text" class="validate">
+			        			<input id="mergerCategory" ref="mergercategory" v-model="mergerCategory" type="text" class="validate autocomplete">
 			        			<label for="mergerCategory">Merger Category Name</label>
 			        		</div>
                             
@@ -97,31 +97,56 @@
 				domain: "",
                 creator: "",
 				description: "",
-				tagsInstance: "",
+				tagsInstance: null,
+				categorySelect_instance: null,
+				mergerCategory_instance: null,
                 mergerSupported: false,
                 nsfw: false,
                 mergerCategory: "",
                 category: null,
-                categories: []
+				categories: [],
+				mergerCategoryNames: []
 			}
 		},
 		beforeMount: function() {
             var self = this;
             page.getCategories()
                 .then((categories) => {
-                    console.log(categories);
                     self.categories = categories;
-                });
+				});
+			page.getMergerCategoryNames()
+				.then((names) => {
+					console.log(names);
+					self.mergerCategoryNames = names;
+				});
 		},
 		updated: function() {
+			console.log("test");
 			var tags = this.$refs.tags;
-			this.tagsInstance = M.Chips.init(tags, {
-				placeholder: "Enter tags",
-				secondaryPlaceholder: "+Tag"
-			});
+			if (!this.tagsInstance) {
+				this.tagsInstance = M.Chips.init(tags, {
+					placeholder: "Enter tags",
+					secondaryPlaceholder: "+Tag"
+				});
+			}
 
-            var categorySelect = this.$refs.categoryselect;
-            var instance = M.FormSelect.init(categorySelect, {});
+			if (!this.categorySelect_instance) {
+				var categorySelect = this.$refs.categoryselect;
+				this.categorySelect_instance = M.FormSelect.init(categorySelect, {});
+			}
+
+			//if (!this.mergerCategory_instance) {
+				var autocompleteData = {};
+				//console.log(this.mergerCategoryNames);
+				for (row in this.mergerCategoryNames) {
+					autocompleteData[this.mergerCategoryNames[row].merger_category] = null;
+				}
+				
+				var mergerCategory = this.$refs.mergercategory;
+				this.mergerCategory_instance = M.Autocomplete.init(mergerCategory, {
+					data: autocompleteData
+				});
+			//}
 		},
 		methods: {
 			goto: function(to) {

@@ -109,6 +109,13 @@ class ZeroApp extends ZeroFrame {
         return page.cmdp("wrapperNotification", ["info", "Unimplemented!"]);
 	}
 	
+	getMergerCategoryNames() {
+		var query = `
+			SELECT DISTINCT merger_category FROM zites
+			`;
+		return page.cmdp("dbQuery", [query]);
+	}
+
 	getCategories() {
 		var query = `
 			SELECT * FROM categories
@@ -127,12 +134,121 @@ class ZeroApp extends ZeroFrame {
 		return page.cmdp("dbQuery", [query]);
 	}
 
+	/*likeExpression(row) {
+		var expression = "";
+		for (var i = 0; i < searchWords.length; i++) {
+			var word = searchWords[i];
+			if (i == searchWords.length - 1) {
+				expression += row + " LIKE '%" + word + "%'";
+			} else {
+				expression += row + " LIKE '%" + word + "%' OR ";
+			}
+		}
+		console.log(expression);
+		return expression;
+	}*/
+
+	matchExpressions(searchWords) {
+		return (row) => {
+			var expressions = "";
+			for (var i = 0; i < searchWords.length; i++) {
+				var word = searchWords[i];
+				expressions += "(SELECT COUNT(" + row + ") FROM zites AS " + row + "match" + i + " WHERE " + row + " LIKE '%" + word + "%' AND zites." + row + "=" + row + "match" + i + "." + row + ") AS " + row + "match" + i;
+				if (i != searchWords.length - 1) {
+					expressions += ", ";
+				}
+			}
+			return expressions;
+		}
+	};
+
+	matches(searchWords) {
+		return (row, multiplication) => {
+			var s = "";
+			for (var i = 0; i < searchWords.length; i++) {
+				if (!multiplication) {
+					s += row + "match" + i;
+				} else {
+					s += "(" + row + "match" + i + " * " + multiplication + ")";
+				}
+				if (i != searchWords.length - 1) {
+					s += " + ";
+				}
+			}
+			return s;
+		}
+	}
+
+	getZitesSearch(searchQuery, pageNum = 0, limit = 8) {
+		const offset = pageNum * limit;
+		var searchWords = searchQuery.split(" ");
+
+		var matchExpressions = this.matchExpressions(searchWords);
+		var matches = this.matches(searchWords);
+		
+		// TODO: Username/id at multiplication of 1
+		// description 2
+		// creator - 3
+		// tags, category_slug - 4
+		// title, domain, address - 5
+		var query = `
+			SELECT *,
+				${matchExpressions('title')}, ${matchExpressions('domain')}, ${matchExpressions('address')},
+				${matchExpressions('tags')}, ${matchExpressions('category_slug')}, ${matchExpressions('merger_category')},
+				${matchExpressions('creator')},
+				${matchExpressions('description')}
+			FROM zites
+			LEFT JOIN json USING (json_id)
+			WHERE (${matches('title')} + ${matches('domain')} + ${matches('address')} 
+				+ ${matches('tags')} + ${matches('category_slug')} + ${matches('merger_category')} 
+				+ ${matches('creator')} 
+				+ ${matches('description')}) > 0
+			ORDER BY (${matches('title', 5)} + ${matches('domain', 5)} + ${matches('address', 5)}
+				+ ${matches('tags', 4)} + ${matches('category_slug', 4)} + ${matches('merger_category', 4)}
+				+ ${matches('creator', 3)} 
+				+ ${matches('description', 2)}) DESC
+			LIMIT ${limit}
+			OFFSET ${offset}
+			`;
+		console.log(query);
+		return page.cmdp("dbQuery", [query]);
+	}
+
 	getZitesInCategory(categorySlug, pageNum = 0, limit = 8) {
 		const offset = pageNum * limit;
 		var query = `
 			SELECT * FROM zites
 			LEFT JOIN json USING (json_id)
 			WHERE category_slug="${categorySlug}"
+			LIMIT ${limit}
+			OFFSET ${offset}
+			`;
+		return page.cmdp("dbQuery", [query]);
+	}
+
+	getZitesInCategorySearch(categorySlug, searchQuery, pageNum = 0, limit = 8) {
+		const offset = pageNum * limit;
+		var searchWords = searchQuery.split(" ");
+
+		var matchExpressions = this.matchExpressions(searchWords);
+		var matches = this.matches(searchWords);
+
+		var query = `
+			SELECT *,
+				${matchExpressions('title')}, ${matchExpressions('domain')}, ${matchExpressions('address')},
+				${matchExpressions('tags')}, ${matchExpressions('category_slug')}, ${matchExpressions('merger_category')},
+				${matchExpressions('creator')},
+				${matchExpressions('description')}	FROM zites
+			LEFT JOIN json USING (json_id)
+			WHERE category_slug="${categorySlug}" AND
+				(${matches('title')} + ${matches('domain')} + ${matches('address')} 
+				+ ${matches('tags')} + ${matches('category_slug')} + ${matches('merger_category')} 
+				+ ${matches('creator')} 
+				+ ${matches('description')}) > 0
+			ORDER BY (${matches('title', 5)} + ${matches('domain', 5)} + ${matches('address', 5)}
+				+ ${matches('tags', 4)} + ${matches('category_slug', 4)} + ${matches('merger_category', 4)}
+				+ ${matches('creator', 3)} 
+				+ ${matches('description', 2)}) DESC
 			LIMIT ${limit}
 			OFFSET ${offset}
 			`;
