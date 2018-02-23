@@ -193,6 +193,9 @@
 			titleChanged: function() {
 				this.title = this.title.replace(/((https?|zero|zeronet)\:\/\/|(127\.0\.0\.1|192\.168\.0\.[0-9]+)(\:[0-9]+)?\/?|localhost|.*(\.(com|net|org|tk|uk|eu|co))+(\:[0-9]+)?\/?|zero\/)/g, "").replace(/(\?|#)\/?$/, "").replace(/\.bit/g, "").replace(/(#.*|\?.*)/g, "").replace(/\/$/g, "");
 			},
+			mergerCategoryChanged: function() {
+				this.mergerCategory = this.mergerCategory.replace(/merger-/g, "");
+			},
 			updateTagsAutocompletion: function() {
 				var data = {};
 				var tags = "";
