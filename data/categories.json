@@ -20,9 +20,9 @@
         },
         {
             "id": 3,
-            "name": "Blog",
+            "name": "Blog / Personal",
             "slug": "blog",
-            "tags": "development,dev,programming,tutorials"
+            "tags": "development,dev,programming,tutorials,portal,projects"
         },
         {
             "id": 4,
