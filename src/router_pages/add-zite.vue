@@ -19,7 +19,7 @@
 			        		</div>
 
 			        		<div class="input-field">
-			        			<input id="domain" v-model="domain" type="text" class="validate" v-on:change="domainChanged()" required>
+			        			<input id="domain" v-model="domain" type="text" class="validate" v-on:change="domainChanged()">
 			        			<label for="domain">Zite .bit Domain (if exists)</label>
 			        		</div>
 
