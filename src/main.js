@@ -282,16 +282,16 @@ class ZeroApp extends ZeroFrame {
 
     			data["zites"].push({
     				"zite_id": date,
-					"title": title,
-					"address": address,
-					"domain": domain,
+					"title": title.trim(),
+					"address": address.trim(),
+					"domain": domain.trim(),
 					"creator": creator,
-					"slug": slug,
-					"description": description,
+					"slug": slug.trim(),
+					"description": description.trim(),
 					"category_slug": category_slug,
-					"tags": tags,
+					"tags": tags.trim(),
 					"merger_supported": merger_supported,
-					"merger_category": merger_category,
+					"merger_category": merger_category.trim(),
     				"date_added": date
     			});
 
