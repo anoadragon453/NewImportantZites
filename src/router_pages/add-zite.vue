@@ -180,10 +180,9 @@
 					tags = "nsfw," + tags;
 				}
 
-                page.addZite(this.title, this.address, this.domain, this.creator, this.description, tags, this.category, this.mergerSupported, this.mergerCategory)
-                    .then(() => {
-                        Router.navigate('');
-                    });
+                page.addZite(this.title, this.address, this.domain, this.creator, this.description, tags, this.category, this.mergerSupported, this.mergerCategory, () => {
+					Router.navigate("");
+				});
 			},
 			addressChanged: function() {
 				this.address = this.address.replace(/((https?|zero|zeronet)\:\/\/|(127\.0\.0\.1|192\.168\.0\.[0-9]+)(\:[0-9]+)?\/?|localhost|.*(\.(com|net|org|tk|uk|eu|co|bit))+(\:[0-9]+)?\/?|zero\/)/g, "").replace(/(\?|#)\/?$/, "").replace(/\/$/g, "");
