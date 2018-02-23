@@ -56,7 +56,7 @@
                                 </label>
                             </div>
                             <div class="input-field">
-			        			<input id="mergerCategory" ref="mergercategory" v-model="mergerCategory" type="text" class="validate autocomplete">
+			        			<input id="mergerCategory" ref="mergercategory" v-model="mergerCategory" v-on:change="mergerCategoryChanged()" type="text" class="validate autocomplete">
 			        			<label for="mergerCategory">Merger Category Name</label>
 			        		</div>
                             
