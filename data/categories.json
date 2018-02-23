@@ -10,7 +10,7 @@
             "id": 1,
             "name": "Social Network",
             "slug": "social-network",
-            "tags": "forum,board,chat"
+            "tags": "forum,board,chat,twitter,twitter-like,facebook,facebook-like,voat"
         },
         {
             "id": 2,
@@ -22,25 +22,25 @@
             "id": 3,
             "name": "Blog",
             "slug": "blog",
-            "tags": ""
+            "tags": "development,dev,programming,tutorials"
         },
         {
             "id": 4,
             "name": "File Sharing / Streaming",
             "slug": "file-sharing-streaming",
-            "tags": "video,audio,images,photos,books,ebooks,music,torrents"
+            "tags": "video,audio,images,photos,books,ebooks,music,torrents,porn"
         },
         {
             "id": 5,
             "name": "News / Info",
             "slug": "news-info",
-            "tags": "tutorials,guides,politics"
+            "tags": "tutorials,guides,politics,development,programming,zeronet,guides"
         },
         {
             "id": 6,
-            "name": "Productivity",
+            "name": "Productivity / Tools",
             "slug": "productivity",
-            "tags": "todo,note-taking,notes"
+            "tags": "todo,note-taking,notes,programming,dev,development,vcs,git,mercurial,fossil,pijul,svn"
         },
         {
             "id": 7,

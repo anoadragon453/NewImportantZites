@@ -1,7 +1,7 @@
 <template>
 	<div id="AddZite" class="container">
 		<div class="row">
-	        <div class="col s12 m7 l9">
+	        <div class="col s12 m12 l9">
 	        	<!--<component :is="topic_navbar" active="ask" :user-info="userInfo"></component>-->
 	        	<div class="card">
 	        		<div class="card-content">
@@ -34,7 +34,7 @@
 			        		</div>
 
                             <div class="input-field col s12">
-                                <select id="categoryselect"  ref="categoryselect" v-model="category" required>
+                                <select id="categoryselect"  ref="categoryselect" v-model="category" v-on:change="updateTagsAutocompletion" required>
                                     <option value="" disabled selected>Choose your option</option>
                                     <option v-for="category in categories" :value="category.slug">{{ category.name }}</option>
                                 </select>
@@ -52,7 +52,7 @@
                             <div>
                                 <label>
                                     <input type="checkbox" v-model="mergerSupported" />
-                                    <span>Merger-Supported (<a href="#">more info</a>)</span>
+                                    <span>Merger-Supported (<em>more info in sidebar, or below on mobile</em>)</span>
                                 </label>
                             </div>
                             <div class="input-field">
@@ -68,7 +68,7 @@
 			        </div>
 	        	</div>
 	        </div>
-	        <div class="col s12 m5 l3">
+	        <div class="col s12 m12 l3">
                 <h4>Merger Settings</h4>
                 <p>
                     If a zite collects data from merger zites, then check the <code>Merger Supported</code> checkbox and enter the <code>Merger Category Name</code> (e.g. ZeroMe, ZeroLSTN, Git Center) in the corresponding field.
@@ -121,12 +121,23 @@
 				});
 		},
 		updated: function() {
-			console.log("test");
 			var tags = this.$refs.tags;
 			if (!this.tagsInstance) {
+				var autocompleteData = {};
+				for (i in this.categories) {
+					var category_tags = this.categories[i].tags.split(",");
+					for (j in category_tags) {
+						var tag = category_tags[j];
+						if (!autocompleteData[tag]) autocompleteData[tag] = null;
+					}
+				}
 				this.tagsInstance = M.Chips.init(tags, {
 					placeholder: "Enter tags",
-					secondaryPlaceholder: "+Tag"
+					secondaryPlaceholder: "+Tag",
+					autocompleteOptions: {
+						data: autocompleteData,
+						limit: Infinity
+					}
 				});
 			}
 
@@ -182,6 +193,22 @@
 			},
 			titleChanged: function() {
 				this.title = this.title.replace(/((https?|zero|zeronet)\:\/\/|(127\.0\.0\.1|192\.168\.0\.[0-9]+)(\:[0-9]+)?\/?|localhost|.*(\.(com|net|org|tk|uk|eu|co))+(\:[0-9]+)?\/?|zero\/)/g, "").replace(/(\?|#)\/?$/, "").replace(/\.bit/g, "").replace(/(#.*|\?.*)/g, "").replace(/\/$/g, "");
+			},
+			updateTagsAutocompletion: function() {
+				var data = {};
+				var tags = "";
+				for (i in this.categories) {
+					var category = this.categories[i];
+					if (category.slug == this.category) {
+						tags = category.tags.split(",");
+						break;
+					}
+				}
+				for (var i = 0; i < tags.length; i++) {
+					data[tags[i]] = null;
+				}
+				
+				this.tagsInstance.autocomplete.updateData(data);
 			}
 		}
 	}

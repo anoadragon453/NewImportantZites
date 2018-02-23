@@ -1,9 +1,9 @@
 <template>
 	<div id="categoryPage" class="container">
 		<div class="row">
-	        <div class="col s12 m7 l9">
+	        <div class="col s12 m12 l9">
 
-				<nav style="background-color: #1976D2; margin-bottom: 10px; margin-top: 8px;">
+				<nav style="background-color: #4caf50; margin-bottom: 15px; margin-top: 8px;">
 					<div class="nav-wrapper">
 					<form onsubmit="return false;">
 						<div class="input-field">
@@ -15,26 +15,23 @@
 					</div>
 				</nav>
 
-                <ul class="pagination" v-if="zites.length >= 4">
+                <!--<ul class="pagination" v-if="zites.length >= 4">
 					<li><a href="#!" v-on:click.prevent="previousPage"><i class="material-icons">chevron_left</i></a></li>
 					<li class="disabled"><a href="#!">{{ pageNum + 1 }}</a></li>
 					<li><a href="#!" v-on:click.prevent="nextPage"><i class="material-icons">chevron_right</i></a></li>
-				</ul>
+				</ul> -->
 
 				<!--<h5>Recent</h5>
 	        	<div class="divider"></div>-->
 				<component :is="zite_list_item" :user-info="userInfo" v-for="zite in zites" :zite="zite" :show-category="true" :categories="categories"></component>
 
-                <!-- TODO: Use getSearchResults when check for length once search has been implemented -->
-				<div style="margin-left: auto; margin-right: auto;">
-					<ul class="pagination" v-if="zites.length != 0">
-						<li><a href="#!" v-on:click.prevent="previousPage"><i class="material-icons">chevron_left</i></a></li>
-						<li class="disabled"><a href="#!">{{ pageNum + 1 }}</a></li>
-						<li><a href="#!" v-on:click.prevent="nextPage"><i class="material-icons">chevron_right</i></a></li>
-					</ul>
-				</div>
+				<ul class="pagination center-align" v-if="zites.length != 0">
+					<li><a href="#!" v-on:click.prevent="previousPage"><i class="material-icons">chevron_left</i></a></li>
+					<li class="disabled"><a href="#!">{{ pageNum + 1 }}</a></li>
+					<li><a href="#!" v-on:click.prevent="nextPage"><i class="material-icons">chevron_right</i></a></li>
+				</ul>
 	        </div>
-	        <div class="col s12 m5 l3">
+	        <div class="col s12 m12 l3">
 	        	<component :is="categoriesSidebar" :categories="categories"></component>
 	        </div>
 	    </div>
