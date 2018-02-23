@@ -74,7 +74,7 @@
                     If a zite collects data from merger zites, then check the <code>Merger Supported</code> checkbox and enter the <code>Merger Category Name</code> (e.g. ZeroMe, ZeroLSTN, Git Center) in the corresponding field.
                 </p>
 				<p>
-					If a zite is a merger zite which is used by merger-supported zites (e.g. KaffieHub used by ZeroMe and Peeper), then enter the name of the Merger Category the zite belongs to in the <code>Merger Category Name</code> field (e.g. KaffieHub belongs to "ZeroMe" Merger Category). The field will Autocomplete with a lit of all Merger Categories used on the zite. If you do not see your merger category listed, just type the name into the field and it will be created upon submission.
+					If a zite is a merger zite which is used by merger-supported zites (e.g. KaffieHub used by ZeroMe and Peeper), then enter the name of the Merger Category the zite belongs to in the <code>Merger Category Name</code> field (e.g. KaffieHub belongs to "ZeroMe" Merger Category). The field will Autocomplete with a list of all Merger Categories used on the zite. If you do not see your merger category listed, just type the name into the field and it will be created upon submission.
                 </p>
 	        	<!--<component :is="connected_topics" :merger-zites="mergerZites"></component>-->
 	        </div>
