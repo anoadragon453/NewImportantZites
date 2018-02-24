@@ -10,7 +10,7 @@
             <!-- Add Zite Creator -->
 			<small>
                 <!--Published {{ getDate }} <span>by <a href="#">{{ getName }}</a><span v-if="showCategory"> in <a href="#">{{ getCategoryName }}</a></span></span><br>-->
-                Created by <a href="#">{{ zite.creator }}</a>
+                Created by <a href="#">{{ zite.creator }}</a>span v-if="zite.creator != getName">, Submitted by <a href="#">{{ getName }}</a></span>
             </small>
 		</div>
 	</div>
