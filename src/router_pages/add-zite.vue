@@ -24,7 +24,7 @@
 			        		</div>
 
                             <div class="input-field">
-			        			<input id="creator" v-model="creator" v-on:changed="creatorChanged()" type="text" class="validate" required>
+			        			<input id="creator" v-model="creator" v-on:change="creatorChanged()" type="text" class="validate" required>
 			        			<label for="creator">Zite Creator/Maintainer *</label>
 			        		</div>
 
