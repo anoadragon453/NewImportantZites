@@ -5,15 +5,27 @@
 
 				<nav style="background-color: #4caf50; margin-bottom: 15px; margin-top: 8px;">
 					<div class="nav-wrapper">
-					<form onsubmit="return false;">
-						<div class="input-field">
-						<input id="search" type="search" placeholder="Search (On Enter)" v-on:change.prevent="getZites" v-model="searchQuery" required>
-						<label class="label-icon" for="search"><i class="material-icons">search</i></label>
-						<i class="material-icons">close</i>
-						</div>
-					</form>
+						<form onsubmit="return false;">
+							<div class="row">
+								<div class="input-field col s10 m11 l12" style="display: inline-block;">
+									<input id="search" type="search" placeholder="Search (On Enter)" v-on:change.prevent="getZites" v-model="searchQuery" required>
+									<label class="label-icon" for="search" style="padding-left: 10px;"><i class="material-icons">search</i></label>
+									<i class="material-icons">close</i>
+								</div>
+								<div class="col s2 m1 hide-on-large-only">
+									<a class="dropdown-trigger" href="#" data-target='searchDropdown' ref="searchDropdownTrigger" style="margin: auto; text-align: center;">
+										<i class="material-icons">keyboard_arrow_down</i>
+									</a>
+								</div>
+							</div>
+						</form>
 					</div>
 				</nav>
+
+				<ul id='searchDropdown' class='dropdown-content' ref="searchDropdown">
+					<li class="active"><a href="./?/" v-on:click.prevent="goto('')">All</a></li>
+					<li v-for="category in categories"><a :href="'./?/category/' + category.slug">{{ category.name }}</a></li>
+				</ul>
 
 				<!--<ul class="pagination center-align" v-if="zites.length >= 4">
 					<li><a href="#!" v-on:click.prevent="previousPage"><i class="material-icons">chevron_left</i></a></li>
@@ -33,7 +45,7 @@
 					<li><a href="#!" v-on:click.prevent="nextPage"><i class="material-icons">chevron_right</i></a></li>
 				</ul>
 	        </div>
-	        <div class="col s12 m12 l3">
+	        <div class="col s12 m12 l3 hide-on-med-and-down">
 	        	<component :is="categoriesSidebar" :categories="categories"></component>
 	        </div>
 	    </div>
@@ -69,6 +81,14 @@
 			this.$parent.$on("update", function() {
 				//self.getQuestions();
 				self.getZites();
+			});
+		},
+		mounted: function() {
+			var searchDropdown = this.$refs.searchDropdownTrigger;
+			var searchDropdown_instance = M.Dropdown.init(searchDropdown, {
+				alignment: "right",
+				constrainWidth: false,
+				coverTrigger: false
 			});
 		},
 		methods: {
