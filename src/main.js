@@ -189,6 +189,46 @@ class ZeroApp extends ZeroFrame {
 		}
 	}
 
+	getMyZitesSearch(searchQuery, pageNum = 0, limit = 8) {
+		if (!this.siteInfo.cert_user_id) {
+    		return this.cmdp("wrapperNotification", ["error", "You must be logged in to add a zite."]);
+		}
+
+		const offset = pageNum * limit;
+		var searchWords = searchQuery.split(" ");
+
+		var matchExpressions = this.matchExpressions(searchWords);
+		var matches = this.matches(searchWords);
+		
+		// TODO: Username/id at multiplication of 1
+		// description 2
+		// creator - 3
+		// tags, category_slug - 4
+		// title, domain, address - 5
+		var query = `
+			SELECT *,
+				${matchExpressions('title')}, ${matchExpressions('domain')}, ${matchExpressions('address')},
+				${matchExpressions('tags')}, ${matchExpressions('category_slug')}, ${matchExpressions('merger_category')},
+				${matchExpressions('creator')},
+				${matchExpressions('description')}
+			FROM zites
+			LEFT JOIN json USING (json_id)
+			WHERE (${matches('title')} + ${matches('domain')} + ${matches('address')} 
+				+ ${matches('tags')} + ${matches('category_slug')} + ${matches('merger_category')} 
+				+ ${matches('creator')} 
+				+ ${matches('description')}) > 0
+				AND directory='users/${app.userInfo.auth_address}'
+			ORDER BY (${matches('title', 5)} + ${matches('domain', 5)} + ${matches('address', 5)}
+				+ ${matches('tags', 4)} + ${matches('category_slug', 4)} + ${matches('merger_category', 4)}
+				+ ${matches('creator', 3)} 
+				+ ${matches('description', 2)}) DESC
+			LIMIT ${limit}
+			OFFSET ${offset}
+			`;
+		console.log(query);
+		return page.cmdp("dbQuery", [query]);
+	}
+
 	getZitesSearch(searchQuery, pageNum = 0, limit = 8) {
 		const offset = pageNum * limit;
 		var searchWords = searchQuery.split(" ");
@@ -436,10 +476,12 @@ var Home = require("./router_pages/home.vue");
 var About = require("./router_pages/about.vue");
 var AddZite = require("./router_pages/add-zite.vue");
 var EditZite = require("./router_pages/edit-zite.vue");
+var MyZites = require("./router_pages/my-zites.vue");
 var CategoryPage = require("./router_pages/categoryPage.vue");
 
 VueZeroFrameRouter.VueZeroFrameRouter_Init(Router, app, [
 	{ route: "about", component: About },
+	{ route: "my-zites", component: MyZites },
 	{ route: "edit-zite/:ziteid", component: EditZite },
 	{ route: "add-zite", component: AddZite },
 	{ route: "category/:categoryslug", component: CategoryPage },

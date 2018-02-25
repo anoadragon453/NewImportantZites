@@ -2,12 +2,18 @@
 	<nav id="navbar" class="green darken-4">
 		<div class="nav-wrapper">
 			<div class="container">
-				<a href="./?/" class="brand-logo" v-on:click.prevent="navbarLinkClick({ route: '' })" style="font-size: 160%;">{{ ZiteName }}</a>
+				<a href="./?/" class="brand-logo left" v-on:click.prevent="navbarLinkClick({ route: '' })" style="font-size: 160%;">{{ ZiteName }}</a>
 				<a href="#" data-target="mobile-nav" class="sidenav-trigger"><i class="material-icons">menu</i></a>
-				<!--<ul class="left">-->
-				<!--</ul>-->
+				<ul class="left" v-if="isLoggedIn && navbarLinksLeft">
+					<li v-for="link in navbarLinksLeft">
+						<a :href="'./?/' + link.route" v-on:click.prevent="navbarLinkClick(link)">{{ link.name }}</a>
+					</li>
+				</ul>
 				<ul class="right hide-on-med-and-down">
-					<li v-for="link in navbarLinks">
+					<li v-for="link in userLinks" v-if="isLoggedIn">
+						<a :href="'./?/' + link.route" v-on:click.prevent="navbarLinkClick(link)">{{ link.name }}</a>
+					</li>
+					<li v-for="link in navbarLinksRight">
 						<a :href="'./?/' + link.route" v-on:click.prevent="navbarLinkClick(link)">{{ link.name }}</a>
 					</li>
 					<li v-if="!isLoggedIn"><a v-on:click.prevent="login()">Login</a></li>
@@ -15,7 +21,13 @@
 				</ul>
 				<ul id="mobile-nav" class="sidenav">
 					<li><a href="./?/" v-on:click.prevent="goto('')">Home</a></li>
-					<li v-for="link in navbarLinks">
+					<li v-for="link in userLinks">
+						<a :href="'./?/' + link.route" v-on:click.prevent="navbarlinkclick(link)">{{ link.name }}</a>
+					</li>
+					<li v-for="link in navbarLinksLeft">
+						<a :href="'./?/' + link.route" v-on:click.prevent="navbarlinkclick(link)">{{ link.name }}</a>
+					</li>
+					<li v-for="link in navbarLinksRight">
 						<a :href="'./?/' + link.route" v-on:click.prevent="navbarLinkClick(link)">{{ link.name }}</a>
 					</li>
 					<li v-if="!isLoggedIn"><a v-on:click.prevent="login()">Login</a></li>
@@ -39,10 +51,10 @@
 		data: () => {
 			return {
 				ZiteName: "Important Zites",
-				navbarLinks: [
+				userLinks: [
+					{ name: "My Zites", route: "my-zites" },
 					{ name: "Add Zite", route: "add-zite" },
-				],
-
+				]
 			}
 		},
 		mounted: function() {
