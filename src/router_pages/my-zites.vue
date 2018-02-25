@@ -1,7 +1,7 @@
 <template>
 	<div id="MyZites" class="container">
 		<div class="row">
-	        <div class="col s12 m12 l9">
+	        <div class="col s12 m12 l12">
 				<nav style="background-color: #4caf50; margin-bottom: 15px; margin-top: 8px;">
 					<div class="nav-wrapper">
 					<form onsubmit="return false;">
