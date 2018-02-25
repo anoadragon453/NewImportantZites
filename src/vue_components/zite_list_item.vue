@@ -1,7 +1,7 @@
 <template>
 	<div class="card" id="zite-list-item">
 		<div class="card-content">
-			<span class="card-title">
+			<span class="card-title" style="margin-bottom: 0;">
 				<a :href="'/' + (zite.domain || zite.address)">{{ zite.title }}</a>
 			</span>
 			<div> <!-- limit text amount in some way, truncate? -->
