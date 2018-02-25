@@ -2,7 +2,7 @@
 	<div id="MyZites" class="container">
 		<div class="row">
 	        <div class="col s12 m12 l8 push-l2">
-				<nav style="background-color: #4caf50; margin-bottom: 15px; margin-top: 8px;">
+				<nav style="background-color: #4caf50; margin-bottom: .8rem; margin-top: 8px;">
 					<div class="nav-wrapper">
 					<form onsubmit="return false;">
 						<div class="input-field">

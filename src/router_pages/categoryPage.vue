@@ -3,7 +3,7 @@
 		<div class="row">
 	        <div class="col s12 m12 l9">
 
-				<nav style="background-color: #4caf50; margin-bottom: 15px; margin-top: 8px;">
+				<nav style="background-color: #4caf50; margin-bottom: .8rem; margin-top: 8px;">
 					<div class="nav-wrapper">
 						<form onsubmit="return false;">
 							<div class="row" style="padding: 0; margin: 0; height: 100%;">
