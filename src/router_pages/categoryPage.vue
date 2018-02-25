@@ -43,7 +43,7 @@
 					<li><a href="#!" v-on:click.prevent="nextPage"><i class="material-icons">chevron_right</i></a></li>
 				</ul>
 	        </div>
-	        <div class="col s12 m12 l3">
+	        <div class="col s12 m12 l3 hide-on-med-and-down">
 	        	<component :is="categoriesSidebar" :categories="categories"></component>
 	        </div>
 	    </div>

@@ -1,44 +1,53 @@
 <template>
-	<nav id="navbar" class="green darken-4">
-		<div class="nav-wrapper">
-			<div class="container">
-				<a href="./?/" class="brand-logo" v-on:click.prevent="navbarLinkClick({ route: '' })" style="font-size: 160%;">{{ ZiteName }}</a>
-				<a href="#" data-target="mobile-nav" class="sidenav-trigger"><i class="material-icons">menu</i></a>
-				<ul class="left" v-if="isLoggedIn && navbarLinksLeft">
-					<li v-for="link in navbarLinksLeft">
-						<a :href="'./?/' + link.route" v-on:click.prevent="navbarLinkClick(link)">{{ link.name }}</a>
-					</li>
-				</ul>
-				<ul class="right hide-on-med-and-down">
-					<li v-for="link in userLinks" v-if="isLoggedIn">
-						<a :href="'./?/' + link.route" v-on:click.prevent="navbarLinkClick(link)">{{ link.name }}</a>
-					</li>
-					<li v-for="link in navbarLinksRight">
-						<a :href="'./?/' + link.route" v-on:click.prevent="navbarLinkClick(link)">{{ link.name }}</a>
-					</li>
-					<li v-if="!isLoggedIn"><a v-on:click.prevent="login()">Login</a></li>
-					<li v-else><a v-on:click.prevent="login()">{{ userInfo ? userInfo.cert_user_id : "" }}</a></li>
-				</ul>
-				<ul id="mobile-nav" class="sidenav">
-					<li><a href="./?/" v-on:click.prevent="goto('')">Home</a></li>
-					<li v-for="link in userLinks">
-						<a :href="'./?/' + link.route" v-on:click.prevent="navbarLinkClick(link)">{{ link.name }}</a>
-					</li>
-					<li v-for="link in navbarLinksLeft">
-						<a :href="'./?/' + link.route" v-on:click.prevent="navbarLinkClick(link)">{{ link.name }}</a>
-					</li>
-					<li v-for="link in navbarLinksRight">
-						<a :href="'./?/' + link.route" v-on:click.prevent="navbarLinkClick(link)">{{ link.name }}</a>
-					</li>
-					<li v-if="!isLoggedIn"><a v-on:click.prevent="login()">Login</a></li>
-					<li v-else><a v-on:click.prevent="">{{ userInfo ? userInfo.cert_user_id : "" }}</a></li>
-					<li v-for="category in categories">
-						<a :href="'./?/category' + category.slug">{{ category.name }}</a>
-					</li>
-				</ul>
+	<div>
+		<ul id="userDropdown" class="dropdown-content">
+			<li><a href="./?/" v-on:click.prevent="goto('')">Home</a></li>
+			<li v-for="link in userLinks" v-if="isLoggedIn">
+				<a :href="'./?/' + link.route" v-on:click.prevent="navbarLinkClick(link)">{{ link.name }}</a>
+			</li>
+			<li class="divider"></li>
+			<!--<li><a href="#">Settings</a></li>
+			<li class="divider"></li>-->
+			<li><a href="#" v-on:click.prevent="login()">Switch User</a></li>
+		</ul>
+		<nav id="navbar" class="green darken-4">
+			<div class="nav-wrapper">
+				<div class="container">
+					<a href="./?/" class="brand-logo" v-on:click.prevent="navbarLinkClick({ route: '' })" style="font-size: 160%;">{{ ZiteName }}</a>
+					<a href="#" data-target="mobile-nav" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+					<ul class="left" v-if="isLoggedIn && navbarLinksLeft">
+						<li v-for="link in navbarLinksLeft">
+							<a :href="'./?/' + link.route" v-on:click.prevent="navbarLinkClick(link)">{{ link.name }}</a>
+						</li>
+					</ul>
+					<ul class="right hide-on-med-and-down">
+						<li v-for="link in navbarLinksRight">
+							<a :href="'./?/' + link.route" v-on:click.prevent="navbarLinkClick(link)">{{ link.name }}</a>
+						</li>
+						<li v-if="!isLoggedIn"><a v-on:click.prevent="login()">Login</a></li>
+						<li v-show="isLoggedIn"><a ref="userDropdownTrigger" class="dropdown-trigger" href="#!" data-target="userDropdown">{{ userInfo ? userInfo.cert_user_id : "" }}<i class="material-icons right">arrow_drop_down</i></a></li>
+					</ul>
+					<ul id="mobile-nav" class="sidenav">
+						<li><a href="./?/" v-on:click.prevent="goto('')">Home</a></li>
+						<li v-for="link in navbarLinksLeft">
+							<a :href="'./?/' + link.route" v-on:click.prevent="navbarLinkClick(link)">{{ link.name }}</a>
+						</li>
+						<li v-for="link in navbarLinksRight">
+							<a :href="'./?/' + link.route" v-on:click.prevent="navbarLinkClick(link)">{{ link.name }}</a>
+						</li>
+						<li v-for="link in userLinks">
+							<a :href="'./?/' + link.route" v-on:click.prevent="navbarLinkClick(link)">{{ link.name }}</a>
+						</li>
+						<li v-if="!isLoggedIn"><a v-on:click.prevent="login()">Login</a></li>
+						<li v-else><a v-on:click.prevent="">{{ userInfo ? userInfo.cert_user_id : "" }}</a></li>
+						<li v-for="category in categories">
+							<a :href="'./?/category' + category.slug">{{ category.name }}</a>
+						</li>
+					</ul>
+				</div>
 			</div>
-		</div>
-	</nav>
+		</nav>
+	</div>
 </template>
 
 <script>
@@ -52,8 +61,10 @@
 			return {
 				ZiteName: "Important Zites",
 				userLinks: [
-					{ name: "My Zites", route: "my-zites" },
-					{ name: "Add Zite", route: "add-zite" },
+					{ name: "My Zites", route: "my-zites" }
+				],
+				navbarLinksRight: [
+					{ name: "Add Zite", route: "add-zite" }
 				]
 			}
 		},
@@ -74,6 +85,12 @@
 					// TODO
 				});*/
 			}
+
+			var userDropdownTrigger_instance = M.Dropdown.init(this.$refs.userDropdownTrigger, {
+				alignment: "right",
+				//constrainWidth: false,
+				coverTrigger: false
+			});
 		},
 		computed: {
 			isLoggedIn: function() {
