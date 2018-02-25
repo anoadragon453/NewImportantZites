@@ -6,7 +6,7 @@
 				<nav style="background-color: #4caf50; margin-bottom: 15px; margin-top: 8px;">
 					<div class="nav-wrapper">
 						<form onsubmit="return false;">
-							<div class="row">
+							<div class="row" style="padding: 0; margin: 0; height: 100%;">
 								<div class="input-field col s10 m11 l12" style="display: inline-block;">
 									<input id="search" type="search" placeholder="Search (On Enter)" v-on:change.prevent="getZites()" v-model="searchQuery" required>
 									<label class="label-icon" for="search" style="padding-left: 10px;"><i class="material-icons">search</i></label>
