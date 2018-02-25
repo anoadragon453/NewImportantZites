@@ -8,7 +8,7 @@
 						<div class="input-field">
 						<input id="search" type="search" placeholder="Search My Zites (On Enter)" v-on:change.prevent="getZites" v-model="searchQuery" required>
 						<label class="label-icon" for="search"><i class="material-icons">search</i></label>
-						<i class="material-icons">close</i>
+						<i class="material-icons" v-on:click.prevent="clearSearch()">close</i>
 						</div>
 					</form>
 					</div>
@@ -20,8 +20,6 @@
 					<li><a href="#!" v-on:click.prevent="nextPage"><i class="material-icons">chevron_right</i></a></li>
 				</ul>-->
 
-				<!--<h5>Recent</h5>
-	        	<div class="divider"></div>-->
 				<component :is="zite_list_item" :user-info="userInfo" v-for="zite in zites" :zite="zite" :show-category="true" :categories="categories"></component>
 
 
@@ -101,7 +99,11 @@
 			nextPage: function() {
 				this.pageNum += 1;
 				this.getZites();
-            }
+            },
+			clearSearch: function() {
+				this.searchQuery = "";
+				this.getZites();
+			}
 		}
 	}
 </script>

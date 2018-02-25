@@ -10,7 +10,7 @@
 								<div class="input-field col s10 m11 l12" style="display: inline-block;">
 									<input id="search" type="search" placeholder="Search (On Enter)" v-on:change.prevent="getZites" v-model="searchQuery" required>
 									<label class="label-icon" for="search" style="padding-left: 10px;"><i class="material-icons">search</i></label>
-									<i class="material-icons">close</i>
+									<i class="material-icons" style="padding-right: 10px;" v-on:click.prevent="clearSearch()">close</i>
 								</div>
 								<div class="col s2 m1 hide-on-large-only">
 									<a class="dropdown-trigger" href="#" data-target='searchDropdown' ref="searchDropdownTrigger" style="margin: auto; text-align: center;">
@@ -33,8 +33,6 @@
 					<li><a href="#!" v-on:click.prevent="nextPage"><i class="material-icons">chevron_right</i></a></li>
 				</ul>-->
 
-				<!--<h5>Recent</h5>
-	        	<div class="divider"></div>-->
 				<component :is="zite_list_item" :user-info="userInfo" v-for="zite in zites" :zite="zite" :show-category="true" :categories="categories"></component>
 
 
@@ -123,15 +121,11 @@
 			nextPage: function() {
 				this.pageNum += 1;
 				this.getZites();
-			}	/*,
-			getQuestions: function() {
-                var self = this;
-
-                page.getQuestionsRecent()
-                    .then((questions) => {
-                        self.recentQuestions = questions;
-                    });
-            }*/
+			},
+			clearSearch: function() {
+				this.searchQuery = "";
+				this.getZites();
+			}
 		}
 	}
 </script>

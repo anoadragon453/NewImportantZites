@@ -6,6 +6,7 @@
 				<a :href="'./?/' + link.route" v-on:click.prevent="navbarLinkClick(link)">{{ link.name }}</a>
 			</li>
 			<li class="divider"></li>
+			<!-- TODO -->
 			<!--<li><a href="#">Settings</a></li>
 			<li class="divider"></li>-->
 			<li><a href="#" v-on:click.prevent="login()">Switch User</a></li>
@@ -70,11 +71,6 @@
 		},
 		mounted: function() {
 			var self = this;
-			/*page.getCategories() // TODO: Duplicated in home and categoryPage pages
-				.then((categories) => {
-					self.categories = categories;
-				});*/
-				
 			var elem = document.querySelector('.sidenav');
   			var instance = new M.Sidenav(elem, {
   				edge: "left",
@@ -88,7 +84,6 @@
 
 			var userDropdownTrigger_instance = M.Dropdown.init(this.$refs.userDropdownTrigger, {
 				alignment: "right",
-				//constrainWidth: false,
 				coverTrigger: false
 			});
 		},
@@ -110,8 +105,6 @@
 				}
 			},
 			login: function() {
-				console.log("Login button clicked!");
-				console.log(this.userInfo);
 				page.selectUser();
 				return false;
 			}
