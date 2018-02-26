@@ -8,7 +8,7 @@
 						<form onsubmit="return false;">
 							<div class="row" style="padding: 0; margin: 0; height: 100%;">
 								<div class="input-field col s10 m11 l12" style="display: inline-block; margin: 0; padding: 0;">
-									<input id="search" type="search" placeholder="Search (On Enter)" v-on:change.prevent="getZites()" v-model="searchQuery" required style="margin: 0;">
+									<input id="search" type="search" placeholder="Search (On Enter)" v-on:change.prevent="getZites()" v-on:input.prevent="getZites" v-model="searchQuery" required style="margin: 0;">
 									<label class="label-icon" for="search" style="padding-left: 10px;"><i class="material-icons">search</i></label>
 									<i class="material-icons" style="padding-right: 10px;" v-on:click.prevent="clearSearch()">close</i>
 								</div>
