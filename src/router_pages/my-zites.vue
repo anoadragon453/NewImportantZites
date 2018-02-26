@@ -6,7 +6,7 @@
 					<div class="nav-wrapper">
 					<form onsubmit="return false;">
 						<div class="input-field">
-						<input id="search" type="search" placeholder="Search My Zites (On Enter)" v-on:change.prevent="getZites" v-on:input.prevent="getZites" v-model="searchQuery" required>
+						<input id="search" type="search" placeholder="Search My Zites" v-on:change.prevent="getZites" v-on:ikeyup="searchEnter($event)" v-model="searchQuery" required>
 						<label class="label-icon" for="search"><i class="material-icons">search</i></label>
 						<i class="material-icons" v-on:click.prevent="clearSearch()">close</i>
 						</div>
@@ -105,6 +105,9 @@
 			clearSearch: function() {
 				this.searchQuery = "";
 				this.getZites();
+			},
+			searchEnter: function(e) {
+				page.cmd("wrapperOpenWindow", ["/" + this.zites[0].address]);
 			}
 		}
 	}
