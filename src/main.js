@@ -181,7 +181,13 @@ class ZeroApp extends ZeroFrame {
 			var expressions = "";
 			for (var i = 0; i < searchWords.length; i++) {
 				var word = searchWords[i];
-				expressions += "(SELECT COUNT(" + row + ") FROM zites AS " + row + "match" + i + " WHERE " + row + " LIKE '%" + word + "%' AND zites." + row + "=" + row + "match" + i + "." + row + " AND zites.id=" + row + "match" + i + ".id AND zites.json_id=" + row + "match" + i + ".json_id) AS " + row + "match" + i;
+				var negate = false;
+				if (word[0] == "-") {
+					negate = true;
+					word = word.slice(1);
+					console.log(word);
+				}
+				expressions += "(SELECT COUNT(" + row + ") FROM zites AS " + row + "match" + i + " WHERE " + row + (negate ? " NOT" : "") + " LIKE '%" + word + "%' AND zites." + row + "=" + row + "match" + i + "." + row + " AND zites.id=" + row + "match" + i + ".id AND zites.json_id=" + row + "match" + i + ".json_id) AS " + row + "match" + i;
 				if (i != searchWords.length - 1) {
 					expressions += ", ";
 				}
