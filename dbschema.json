@@ -61,12 +61,11 @@
                 ["id", "INTEGER"],
                 ["reference_id", "INTEGER"],
                 ["reference_auth_address", "TEXT"],
-                ["date_updated", "INTEGER"],
                 ["date_added", "INTEGER"],
                 ["json_id", "INTEGER REFERENCES json (json_id)"]
             ],
             "indexes": ["CREATE UNIQUE INDEX bookmarks_key ON bookmarks (json_id, id)", "CREATE INDEX bookmarks_idx ON bookmarks (reference_id, reference_auth_address)", "CREATE INDEX bookmarks_date_added_idx ON bookmarks (date_added DESC)"],
-            "schema_changed": 3
+            "schema_changed": 4
         }
     }
 }

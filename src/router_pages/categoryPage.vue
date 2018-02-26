@@ -75,7 +75,9 @@
             if (Router.currentParams["page"])
                 this.pageNum = parseInt(Router.currentParams["page"]);
 
-			this.getZites();
+			if (this.userInfo) {
+				this.getZites();
+			}
 			this.getCategories();
 			this.$parent.$on("update", function() {
 				//self.getQuestions();

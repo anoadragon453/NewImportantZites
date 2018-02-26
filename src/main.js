@@ -126,7 +126,9 @@ class ZeroApp extends ZeroFrame {
 
 	getZite(auth_address, id) {
 		var query = `
-			SELECT * FROM zites
+			SELECT *
+				${app.userInfo && app.userInfo.auth_address ? ", " + this.subQueryBookmarks() : ""}
+			FROM zites
 			LEFT JOIN json USING (json_id)
 			WHERE id=${id} AND json.directory='users/${auth_address}'
 			LIMIT 1
@@ -137,7 +139,9 @@ class ZeroApp extends ZeroFrame {
 	getZites(pageNum = 0, limit = 8) {
 		const offset = pageNum * limit;
 		var query = `
-			SELECT * FROM zites
+			SELECT *
+				${app.userInfo && app.userInfo.auth_address ? ", " + this.subQueryBookmarks() : ""}
+			FROM zites
 			LEFT JOIN json USING (json_id)
 			LIMIT ${limit}
 			OFFSET ${offset}
@@ -145,6 +149,19 @@ class ZeroApp extends ZeroFrame {
 		return page.cmdp("dbQuery", [query]);
 	}
 
+	getBookmarkZites(pageNum = 0, limit = 8) {
+		const offset = pageNum * limit;
+		var query = `
+			SELECT *
+				${app.userInfo && app.userInfo.auth_address ? ", " + this.subQueryBookmarks() : ""}
+			FROM zites
+				${app.userInfo && app.userInfo.auth_address ? "WHERE bookmarkCount >= 1" : ""}
+			LEFT JOIN json USING (json_id)
+			LIMIT ${limit}
+			OFFSET ${offset}
+			`;
+		return page.cmdp("dbQuery", [query]);
+	}
 	/*likeExpression(row) {
 		var expression = "";
 		for (var i = 0; i < searchWords.length; i++) {
@@ -237,6 +254,44 @@ class ZeroApp extends ZeroFrame {
 		return page.cmdp("dbQuery", [query]);
 	}
 
+	getBookmarkZitesSearch(searchQuery, pageNum = 0, limit = 8) {
+		const offset = pageNum * limit;
+		var searchWords = searchQuery.split(" ");
+
+		var matchExpressions = this.matchExpressions(searchWords);
+		var matches = this.matches(searchWords);
+		
+		// TODO: Username/id at multiplication of 1
+		// description 2
+		// creator - 3
+		// tags, category_slug - 4
+		// title, domain, address - 5
+		var query = `
+			SELECT *,
+				${matchExpressions('title')}, ${matchExpressions('domain')}, ${matchExpressions('address')},
+				${matchExpressions('tags')}, ${matchExpressions('category_slug')}, ${matchExpressions('merger_category')},
+				${matchExpressions('creator')},
+				${matchExpressions('description')}
+				${app.userInfo && app.userInfo.auth_address ? ", " + this.subQueryBookmarks() : ""}
+			FROM zites
+			LEFT JOIN json USING (json_id)
+			WHERE (${matches('title')} + ${matches('domain')} + ${matches('address')} 
+				+ ${matches('tags')} + ${matches('category_slug')} + ${matches('merger_category')} 
+				+ ${matches('creator')} 
+				+ ${matches('description')}) > 0
+				${app.userInfo && app.userInfo.auth_address ? " AND bookmarkCount >= 1" : ""}
+			ORDER BY   (${matches('title', 5)} + ${matches('domain', 5)} + ${matches('address', 5)}
+				+ ${matches('tags', 4)} + ${matches('category_slug', 4)} + ${matches('merger_category', 4)}
+				+ ${matches('creator', 3)} 
+				+ ${matches('description', 2)}) DESC
+			LIMIT ${limit}
+			OFFSET ${offset}
+			`;
+		console.log(query);
+		return page.cmdp("dbQuery", [query]);
+	}
+
+
 	getZitesSearch(searchQuery, pageNum = 0, limit = 8) {
 		const offset = pageNum * limit;
 		var searchWords = searchQuery.split(" ");
@@ -276,7 +331,9 @@ class ZeroApp extends ZeroFrame {
 	getZitesInCategory(categorySlug, pageNum = 0, limit = 8) {
 		const offset = pageNum * limit;
 		var query = `
-			SELECT * FROM zites
+			SELECT *
+				${app.userInfo && app.userInfo.auth_address ? ", " + this.subQueryBookmarks() : ""}
+			FROM zites
 			LEFT JOIN json USING (json_id)
 			WHERE category_slug="${categorySlug}"
 			LIMIT ${limit}
@@ -297,7 +354,9 @@ class ZeroApp extends ZeroFrame {
 				${matchExpressions('title')}, ${matchExpressions('domain')}, ${matchExpressions('address')},
 				${matchExpressions('tags')}, ${matchExpressions('category_slug')}, ${matchExpressions('merger_category')},
 				${matchExpressions('creator')},
-				${matchExpressions('description')}	FROM zites
+				${matchExpressions('description')}
+				${app.userInfo && app.userInfo.auth_address ? ", " + this.subQueryBookmarks() : ""}
+			FROM zites
 			LEFT JOIN json USING (json_id)
 			WHERE category_slug="${categorySlug}" AND
 				(${matches('title')} + ${matches('domain')} + ${matches('address')} 
@@ -307,7 +366,7 @@ class ZeroApp extends ZeroFrame {
 			ORDER BY (${matches('title', 5)} + ${matches('domain', 5)} + ${matches('address', 5)}
 				+ ${matches('tags', 4)} + ${matches('category_slug', 4)} + ${matches('merger_category', 4)}
 				+ ${matches('creator', 3)} 
-				+ ${matches('description', 2)}) DESC
+				+ ${matches('description', 2)} ${app.userInfo && app.userInfo.auth_address ? " + (bookmarkCount * 6)" : ""}) DESC
 			LIMIT ${limit}
 			OFFSET ${offset}
 			`;
@@ -518,6 +577,71 @@ class ZeroApp extends ZeroFrame {
 	    	});
 	}
 
+	removeBookmark(reference_id, reference_auth_address, beforePublishCB) {
+		if (!this.siteInfo.cert_user_id) {
+    		return this.cmdp("wrapperNotification", ["error", "You must be logged in to add a zite."]);
+    	}
+
+    	var data_inner_path = "data/users/" + this.siteInfo.auth_address + "/data.json";
+    	var content_inner_path = "data/users/" + this.siteInfo.auth_address + "/content.json";
+
+    	var self = this;
+    	return this.cmdp("fileGet", { "inner_path": data_inner_path, "required": false })
+    		.then((data) => {
+    			data = JSON.parse(data);
+    			if (!data) {
+					return; // TODO: Error!
+    			}
+
+    			if (!data["bookmarks"]) {
+					return; // TODO: Error!
+				}
+
+				var date = Date.now();
+				var keepLooping = true;
+				while (keepLooping) {
+					for (let i = 0; i < data["bookmarks"].length; i++) { // Go thorough whole list in case of duplicates
+						var bookmark = data["bookmarks"][i];
+						if (bookmark.reference_id == reference_id && bookmark.reference_auth_address == reference_auth_address) {
+							if (i == data["bookmarks"].length - 1) {
+								keepLooping = false;
+							}
+							data["bookmarks"].splice(i, 1);
+							break;
+						} else {
+							if (i == data["bookmarks"].length - 1) {
+								keepLooping = false;
+							}
+						}
+					}
+				}
+
+    			var json_raw = unescape(encodeURIComponent(JSON.stringify(data, undefined, '\t')));
+
+    			return self.cmdp("fileWrite", [data_inner_path, btoa(json_raw)])
+					.then((res) => {
+		    			if (res === "ok") {
+		    				return self.cmdp("siteSign", { "inner_path": content_inner_path })
+		    					.then((res) => {
+		    						if (res === "ok") {
+		    							if (beforePublishCB != null && typeof beforePublishCB === "function") beforePublishCB({ "id": date, "auth_address": self.siteInfo.auth_address });
+		    							return self.cmdp("sitePublish", { "inner_path": content_inner_path, "sign": false })
+		    								.then(() => {
+		    									return { "id": date, "auth_address": self.siteInfo.auth_address };
+		    								}).catch((err) => {
+                                                console.log(err);
+                                                return { "id": date, "auth_address": self.siteInfo.auth_address, "err": err };
+                                            });
+		    						} else {
+		    							return self.cmdp("wrapperNotification", ["error", "Failed to sign user data."]);
+		    						}
+		    					});
+		    			} else {
+		    				return self.cmdp("wrapperNotification", ["error", "Failed to write to data file."]);
+		    			}
+		    		});
+	    	});
+	}
 }
 
 page = new ZeroApp();
@@ -527,10 +651,12 @@ var About = require("./router_pages/about.vue");
 var AddZite = require("./router_pages/add-zite.vue");
 var EditZite = require("./router_pages/edit-zite.vue");
 var MyZites = require("./router_pages/my-zites.vue");
+var MyBookmarks = require("./router_pages/my-bookmarks.vue");
 var CategoryPage = require("./router_pages/categoryPage.vue");
 
 VueZeroFrameRouter.VueZeroFrameRouter_Init(Router, app, [
 	{ route: "about", component: About },
+	{ route: "my-bookmarks", component: MyBookmarks },
 	{ route: "my-zites", component: MyZites },
 	{ route: "edit-zite/:ziteid", component: EditZite },
 	{ route: "add-zite", component: AddZite },

@@ -62,7 +62,8 @@
 			return {
 				ZiteName: "Important Zites",
 				userLinks: [
-					{ name: "My Zites", route: "my-zites" }
+					{ name: "My Zites", route: "my-zites" },
+					{ name: "My Bookmarks", route: "my-bookmarks" }
 				],
 				navbarLinksRight: [
 					{ name: "Add Zite", route: "add-zite" }

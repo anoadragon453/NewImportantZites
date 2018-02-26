@@ -1,5 +1,5 @@
 <template>
-	<div id="MyZites" class="container">
+	<div id="MyBookmarks" class="container">
 		<div class="row">
 	        <div class="col s12 m12 l8 push-l2">
 				<nav style="background-color: #4caf50; margin-bottom: .8rem; margin-top: 8px;">
@@ -44,7 +44,7 @@
 
 	module.exports = {
 		props: ["userInfo"],
-		name: "MyZites",
+		name: "MyBookmarks",
 		data: () => {
 			return {
 				//categoriesSidebar: categoriesSidebar,
@@ -83,7 +83,7 @@
 			},
 			getZites: function() {
 				var self = this;
-				page.getMyZitesSearch(this.searchQuery, this.pageNum)
+				page.getBookmarkZitesSearch(this.searchQuery, this.pageNum)
 					.then((zites) => {
 						if (zites.length == 0 && self.pageNum != 0) {
 							self.pageNum--;
@@ -109,3 +109,4 @@
 		}
 	}
 </script>
+
