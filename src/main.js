@@ -50,7 +50,8 @@ var app = new Vue({
                 auth_address: that.siteInfo.auth_address//,
                 //keyvalue: keyvalue
             };
-            that.$emit("setuserinfo", that.userInfo);
+			that.$emit("setuserinfo", that.userInfo);
+			that.$emit("update");
             if (f !== null && typeof f === "function") f();
 
             /*page.cmd("dbQuery", ["SELECT key, value FROM keyvalue LEFT JOIN json USING (json_id) WHERE cert_user_id=\"" + this.siteInfo.cert_user_id + "\" AND directory=\"users/" + this.siteInfo.auth_address + "\""], (rows) => {
@@ -163,7 +164,7 @@ class ZeroApp extends ZeroFrame {
 			var expressions = "";
 			for (var i = 0; i < searchWords.length; i++) {
 				var word = searchWords[i];
-				expressions += "(SELECT COUNT(" + row + ") FROM zites AS " + row + "match" + i + " WHERE " + row + " LIKE '%" + word + "%' AND zites." + row + "=" + row + "match" + i + "." + row + ") AS " + row + "match" + i;
+				expressions += "(SELECT COUNT(" + row + ") FROM zites AS " + row + "match" + i + " WHERE " + row + " LIKE '%" + word + "%' AND zites." + row + "=" + row + "match" + i + "." + row + " AND zites.id=" + row + "match" + i + ".id AND zites.json_id=" + row + "match" + i + ".json_id) AS " + row + "match" + i;
 				if (i != searchWords.length - 1) {
 					expressions += ", ";
 				}
@@ -187,6 +188,13 @@ class ZeroApp extends ZeroFrame {
 			}
 			return s;
 		}
+	}
+
+	subQueryBookmarks() {
+		var s = `
+			(SELECT DISTINCT COUNT(*) FROM bookmarks LEFT JOIN json AS bookmarksjson USING (json_id) WHERE zites.id=bookmarks.reference_id AND bookmarksjson.directory='users/${app.userInfo.auth_address}') AS bookmarkCount
+			`;
+		return s;
 	}
 
 	getMyZitesSearch(searchQuery, pageNum = 0, limit = 8) {
@@ -247,16 +255,17 @@ class ZeroApp extends ZeroFrame {
 				${matchExpressions('tags')}, ${matchExpressions('category_slug')}, ${matchExpressions('merger_category')},
 				${matchExpressions('creator')},
 				${matchExpressions('description')}
+				${app.userInfo && app.userInfo.auth_address ? ", " + this.subQueryBookmarks() : ""}
 			FROM zites
 			LEFT JOIN json USING (json_id)
 			WHERE (${matches('title')} + ${matches('domain')} + ${matches('address')} 
 				+ ${matches('tags')} + ${matches('category_slug')} + ${matches('merger_category')} 
 				+ ${matches('creator')} 
 				+ ${matches('description')}) > 0
-			ORDER BY (${matches('title', 5)} + ${matches('domain', 5)} + ${matches('address', 5)}
+			ORDER BY   (${matches('title', 5)} + ${matches('domain', 5)} + ${matches('address', 5)}
 				+ ${matches('tags', 4)} + ${matches('category_slug', 4)} + ${matches('merger_category', 4)}
 				+ ${matches('creator', 3)} 
-				+ ${matches('description', 2)}) DESC
+				+ ${matches('description', 2)} ${app.userInfo && app.userInfo.auth_address ? " + (bookmarkCount * 6)" : ""}) DESC
 			LIMIT ${limit}
 			OFFSET ${offset}
 			`;
@@ -426,21 +435,62 @@ class ZeroApp extends ZeroFrame {
 					}
 				}
 
-    			/*data["zites"].push({
-    				"id": date,
-					"title": title.trim(),
-					"address": address.trim(),
-					"domain": domain.trim(),
-					"creator": creator,
-					"slug": slug.trim(),
-					"description": description.trim(),
-					"category_slug": category_slug,
-					"tags": tags.trim(),
-					"merger_supported": merger_supported,
-					"merger_category": merger_category.trim(),
-    				"date_added": date
-    			});*/
+    			var json_raw = unescape(encodeURIComponent(JSON.stringify(data, undefined, '\t')));
 
+    			return self.cmdp("fileWrite", [data_inner_path, btoa(json_raw)])
+					.then((res) => {
+		    			if (res === "ok") {
+		    				return self.cmdp("siteSign", { "inner_path": content_inner_path })
+		    					.then((res) => {
+		    						if (res === "ok") {
+		    							if (beforePublishCB != null && typeof beforePublishCB === "function") beforePublishCB({ "id": date, "auth_address": self.siteInfo.auth_address });
+		    							return self.cmdp("sitePublish", { "inner_path": content_inner_path, "sign": false })
+		    								.then(() => {
+		    									return { "id": date, "auth_address": self.siteInfo.auth_address };
+		    								}).catch((err) => {
+                                                console.log(err);
+                                                return { "id": date, "auth_address": self.siteInfo.auth_address, "err": err };
+                                            });
+		    						} else {
+		    							return self.cmdp("wrapperNotification", ["error", "Failed to sign user data."]);
+		    						}
+		    					});
+		    			} else {
+		    				return self.cmdp("wrapperNotification", ["error", "Failed to write to data file."]);
+		    			}
+		    		});
+	    	});
+	}
+
+	addBookmark(reference_id, reference_auth_address, beforePublishCB) {
+		if (!this.siteInfo.cert_user_id) {
+    		return this.cmdp("wrapperNotification", ["error", "You must be logged in to add a zite."]);
+    	}
+
+    	var data_inner_path = "data/users/" + this.siteInfo.auth_address + "/data.json";
+    	var content_inner_path = "data/users/" + this.siteInfo.auth_address + "/content.json";
+
+    	var self = this;
+    	return this.cmdp("fileGet", { "inner_path": data_inner_path, "required": false })
+    		.then((data) => {
+    			data = JSON.parse(data);
+    			if (!data) {
+					data = {};
+    			}
+
+    			if (!data["bookmarks"]) {
+					data["bookmarks"] = [];
+				}
+
+				var date = Date.now();
+
+				data["bookmarks"].push({
+					"id": date,
+					"reference_id": reference_id,
+					"reference_auth_address": reference_auth_address,
+					"date_added": date
+				});
+				
     			var json_raw = unescape(encodeURIComponent(JSON.stringify(data, undefined, '\t')));
 
     			return self.cmdp("fileWrite", [data_inner_path, btoa(json_raw)])

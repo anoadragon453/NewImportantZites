@@ -7,7 +7,7 @@
             "to_table": ["categories"]
         },
         "users/.+/data.json": {
-            "to_table": ["zites", "upvotes"]
+            "to_table": ["zites", "bookmarks"]
         },
         "users/.+/content.json": {
             "to_json_table": ["cert_user_id"],
@@ -56,18 +56,17 @@
             "indexes": ["CREATE UNIQUE INDEX ZITE_key ON zites (json_id, id)", "CREATE INDEX zite_slug_idx ON zites (slug)", "CREATE INDEX zite_date_added_idx ON zites (date_added DESC)"],
             "schema_changed": 6
         },
-        "upvotes": {
+        "bookmarks": {
             "cols": [
                 ["id", "INTEGER"],
-                ["number", "INTEGER"],
                 ["reference_id", "INTEGER"],
                 ["reference_auth_address", "TEXT"],
                 ["date_updated", "INTEGER"],
                 ["date_added", "INTEGER"],
                 ["json_id", "INTEGER REFERENCES json (json_id)"]
             ],
-            "indexes": ["CREATE UNIQUE INDEX upvote_key ON upvotes (json_id, id)", "CREATE INDEX upvote_reference_idx ON upvotes (reference_id, reference_auth_address)", "CREATE INDEX upvote_date_added_idx ON upvotes (date_added DESC)"],
-            "schema_changed": 2
+            "indexes": ["CREATE UNIQUE INDEX bookmarks_key ON bookmarks (json_id, id)", "CREATE INDEX bookmarks_idx ON bookmarks (reference_id, reference_auth_address)", "CREATE INDEX bookmarks_date_added_idx ON bookmarks (date_added DESC)"],
+            "schema_changed": 3
         }
     }
 }

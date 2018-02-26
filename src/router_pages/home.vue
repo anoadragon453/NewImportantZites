@@ -33,7 +33,7 @@
 					<li><a href="#!" v-on:click.prevent="nextPage"><i class="material-icons">chevron_right</i></a></li>
 				</ul>-->
 
-				<component :is="zite_list_item" :user-info="userInfo" v-for="zite in zites" :zite="zite" :show-category="true" :categories="categories"></component>
+				<component :is="zite_list_item" :user-info="userInfo" v-for="zite in zites" :zite="zite" :show-category="true" :categories="categories" v-on:update="getZites()"></component>
 
 
 				<!-- TODO: Use getSearchResults when check for length once search has been implemented -->
@@ -74,8 +74,11 @@
 			if (Router.currentParams["page"])
 				this.pageNum = parseInt(Router.currentParams["page"]);
 
-			this.getZites();
+			if (this.userInfo) {
+				this.getZites();
+			}
 			this.getCategories();
+			
 			this.$parent.$on("update", function() {
 				//self.getQuestions();
 				self.getZites();

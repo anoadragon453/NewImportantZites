@@ -11,7 +11,7 @@
 			<small>
                 <!--Published {{ getDate }} <span>by <a href="#">{{ getName }}</a><span v-if="showCategory"> in <a href="#">{{ getCategoryName }}</a></span></span><br>-->
                 Created by <a href="#">{{ zite.creator }}</a><span v-if="zite.creator.toLowerCase().replace(/@.*/g, '').replace(/\s/g, '') != getName.toLowerCase()">, Submitted by <a href="#">{{ getName }}</a></span>
-				<em v-if="userIsOwner"> | <a :href="'edit-zie/' + zite.id" v-on:click.prevent="goto('edit-zite/' + zite.id)">Edit</a></em>
+				<em v-if="userIsOwner"> | <a :href="'edit-zie/' + zite.id" v-on:click.prevent="goto('edit-zite/' + zite.id)">Edit</a></em><em> | <a href="#" v-on:click.prevent="addBookmark()">Bookmark</a></em>
             </small>
 		</div>
 	</div>
@@ -53,6 +53,18 @@
 		methods: {
 			goto: function(to) {
 				Router.navigate(to);
+			},
+			addBookmark: function() {
+				if (!this.userInfo) {
+					page.cmd("wrapperNotification", ["info", "Please login first!"]);
+					page.selectUser();
+					return false;
+				}
+
+				var self = this;
+				page.addBookmark(this.zite.id, this.getAuthAddress, () => {
+					self.$emit("update");
+				});
 			}
 		}
 	};
