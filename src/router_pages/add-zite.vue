@@ -118,6 +118,13 @@
 				.then((names) => {
 					console.log(names);
 					self.mergerCategoryNames = names;
+					var autocompleteData = {};
+					//console.log(this.mergerCategoryNames);
+					for (var row in this.mergerCategoryNames) {
+						autocompleteData[this.mergerCategoryNames[row].merger_category] = null;
+					}
+
+					self.mergerCategory_instance.updateData(autocompleteData);
 				});
 		},
 		updated: function() {
@@ -146,18 +153,22 @@
 				this.categorySelect_instance = M.FormSelect.init(categorySelect, {});
 			}
 
-			//if (!this.mergerCategory_instance) {
+			if (!this.mergerCategory_instance) {
 				var autocompleteData = {};
 				//console.log(this.mergerCategoryNames);
-				for (row in this.mergerCategoryNames) {
+				for (var row in this.mergerCategoryNames) {
 					autocompleteData[this.mergerCategoryNames[row].merger_category] = null;
 				}
 				
 				var mergerCategory = this.$refs.mergercategory;
+				var self = this;
 				this.mergerCategory_instance = M.Autocomplete.init(mergerCategory, {
-					data: autocompleteData
+					data: autocompleteData,
+					onAutocomplete: (text) => {
+						self.mergerCategory = text;
+					}
 				});
-			//}
+			}
 		},
 		methods: {
 			goto: function(to) {
