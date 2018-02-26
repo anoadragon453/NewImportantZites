@@ -44,6 +44,12 @@
         },
         {
             "id": 7,
+            "name": "Merger Zite",
+            "slug": "merger-zite",
+            "tags": ""
+        },
+        {
+            "id": 7,
             "name": "Other",
             "slug": "other",
             "tags": ""
