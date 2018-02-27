@@ -124,6 +124,17 @@ class ZeroApp extends ZeroFrame {
 		return page.cmdp("dbQuery", [query]);
 	}
 
+	getZiteByAddress(address) {
+		var query = `
+			SELECT *
+			FROM zites
+			LEFT JOIN json USING (json_id)
+			WHERE address='${address}'
+			LIMIT 1
+			`;
+		return page.cmdp("dbQuery", [query]);
+	}
+	
 	getZite(auth_address, id) {
 		var query = `
 			SELECT *

@@ -105,7 +105,8 @@
                 mergerCategory: "",
                 category: null,
 				categories: [],
-				mergerCategoryNames: []
+				mergerCategoryNames: [],
+				alreadyExists: false
 			}
 		},
 		beforeMount: function() {
@@ -181,6 +182,11 @@
 					return; // Not logged in
 				}
 
+				if (this.alreadyExists) {
+					page.cmd("wrapperNotification", ["error", "This zite was already added.<br>\nContact zite owner at krixano@zeroid.bit<br>\non ZeroMail if you own the zite and want<br>\nto transfer it to your profile."]);
+					return;
+				}
+
                 var tags = "";
                 for (var i = 0; i < this.tagsInstance.chipsData.length; i++) {
 					var chip = this.tagsInstance.chipsData[i];
@@ -201,6 +207,16 @@
 			},
 			addressChanged: function() {
 				this.address = this.address.replace(/((https?|zero|zeronet)\:\/\/|(127\.0\.0\.1|192\.168\.0\.[0-9]+)(\:[0-9]+)?\/?|localhost|.*(\.(com|net|org|tk|uk|eu|co|bit))+(\:[0-9]+)?\/?|zero\/)/g, "").replace(/(\?|#)\/?$/, "").replace(/\/$/g, "");
+
+				// Check if already exists.
+				var self = this;
+				page.getZiteByAddress(this.address)
+					.then((zites) => {
+						if (zites[0]) {
+							self.alreadyExists = true;
+							page.cmd("wrapperNotification", ["error", "This zite was already added.<br>\nContact zite owner at krixano@zeroid.bit<br>\non ZeroMail if you own the zite and want<br>\nto transfer it to your profile."]);
+						}
+					})
 			},
 			domainChanged: function() {
 				this.domain = this.domain.replace(/((https?|zero|zeronet)\:\/\/|(127\.0\.0\.1|192\.168\.0\.[0-9]+)(\:[0-9]+)?\/?|localhost|.*(\.(com|net|org|tk|uk|eu|co))+(\:[0-9]+)?\/?|zero\/)/g, "").replace(/(\?|#)\/?$/, "").replace(/\/$/g, "");
