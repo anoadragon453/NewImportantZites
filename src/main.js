@@ -180,7 +180,7 @@ class ZeroApp extends ZeroFrame {
 		return (row) => {
 			var expressions = "";
 			for (var i = 0; i < searchWords.length; i++) {
-				var word = searchWords[i];
+				var word = searchWords[i].replace(/'/g, "''").replace(/%/g, "[%]");
 				var negate = false;
 				if (word[0] == "-") {
 					negate = true;
