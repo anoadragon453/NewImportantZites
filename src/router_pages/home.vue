@@ -75,16 +75,13 @@
 			if (Router.currentParams["page"])
 				this.pageNum = parseInt(Router.currentParams["page"]);
 
-			this.firstUpdate = true;
-			this.getZites();
+			this.getZites(); // TODO: Loads twice on initial page load
 			this.getCategories();
 			
 			this.$parent.$on("update", function() {
 				//self.getQuestions();
-				if (!self.firstUpdate) {
-					self.getZites();
-					self.firstUpdate = false;
-				}
+				self.getZites();
+				self.firstUpdate = false;
 			});
 		},
 		mounted: function() {
