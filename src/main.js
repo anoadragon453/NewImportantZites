@@ -41,6 +41,8 @@ var app = new Vue({
 		getUserInfo: function(f = null) {
             if (this.siteInfo == null || this.siteInfo.cert_user_id == null) {
                 this.userInfo = null;
+				this.$emit("setuserinfo", this.userInfo);
+				this.$emit("update");
                 return;
             }
 
@@ -189,8 +191,19 @@ class ZeroApp extends ZeroFrame {
 		return page.cmdp("dbQuery", [query]);
 	}
 
+	subQueryBookmarks() {
+		if (!app.userInfo || !app.userInfo.auth_address) {
+			return "";
+		}
+		var s = `
+			SELECT DISTINCT COUNT(*) FROM bookmarks LEFT JOIN json AS bookmarksjson USING (json_id) WHERE zites.id=bookmarks.reference_id AND bookmarksjson.directory='users/${app.userInfo.auth_address}'
+			`;
+		return s;
+	}
+
 	// TODO: Username/id at multiplication of 1
 	getZitesSearch(searchQuery, pageNum = 0, limit = 8) {
+		console.log(app.userInfo);
 		return searchDbQuery(this, searchQuery, {
 			orderByScore: true,
 			select: "*",
@@ -203,7 +216,7 @@ class ZeroApp extends ZeroFrame {
 				{ col: "merger_category", score: 4 },
 				{ col: "creator", score: 3 },
 				{ col: "description", score: 2 },
-				{ col: "bookmarkCount", select: this.subQueryBookmarks(), inSearchMatchesAdded: false, inSearchMatchesOrderBy: true, score: 6 } // TODO: Rename inSearchMatchesAdded, and isSearchMatchesOrderBy
+				{ skip: !app.userInfo || !app.userInfo.auth_address, col: "bookmarkCount", select: this.subQueryBookmarks(), inSearchMatchesAdded: false, inSearchMatchesOrderBy: true, score: 6 } // TODO: Rename inSearchMatchesAdded, and isSearchMatchesOrderBy
 			],
 			table: "zites",
 			join: "LEFT JOIN json USING (json_id)",
@@ -225,7 +238,7 @@ class ZeroApp extends ZeroFrame {
 				{ col: "merger_category", score: 4 },
 				{ col: "creator", score: 3 },
 				{ col: "description", score: 2 },
-				{ col: "bookmarkCount", select: this.subQueryBookmarks(), inSearchMatchesAdded: false, inSearchMatchesOrderBy: true, score: 6 } // TODO: Rename inSearchMatchesAdded, and isSearchMatchesOrderBy
+				{ skip: !app.userInfo || !app.userInfo.auth_address, col: "bookmarkCount", select: this.subQueryBookmarks(), inSearchMatchesAdded: false, inSearchMatchesOrderBy: true, score: 6 } // TODO: Rename inSearchMatchesAdded, and isSearchMatchesOrderBy
 			],
 			table: "zites",
 			where: "category_slug='" + categorySlug + "'",
@@ -235,12 +248,6 @@ class ZeroApp extends ZeroFrame {
 		});
 	}
 
-	subQueryBookmarks() {
-		var s = `
-			SELECT DISTINCT COUNT(*) FROM bookmarks LEFT JOIN json AS bookmarksjson USING (json_id) WHERE zites.id=bookmarks.reference_id AND bookmarksjson.directory='users/${app.userInfo.auth_address}'
-			`;
-		return s;
-	}
 
 	getMyZitesSearch(searchQuery, pageNum = 0, limit = 8) {
 		if (!this.siteInfo.cert_user_id) {
@@ -259,7 +266,7 @@ class ZeroApp extends ZeroFrame {
 				{ col: "merger_category", score: 4 },
 				{ col: "creator", score: 3 },
 				{ col: "description", score: 2 },
-				{ col: "bookmarkCount", select: this.subQueryBookmarks(), inSearchMatchesAdded: false, inSearchMatchesOrderBy: true, score: 6 } // TODO: Rename inSearchMatchesAdded, and isSearchMatchesOrderBy
+				{ skip: !app.userInfo || !app.userInfo.auth_address, col: "bookmarkCount", select: this.subQueryBookmarks(), inSearchMatchesAdded: false, inSearchMatchesOrderBy: true, score: 6 } // TODO: Rename inSearchMatchesAdded, and isSearchMatchesOrderBy
 			],
 			table: "zites",
 			where: "directory='users/" + app.userInfo.auth_address + "'",
@@ -286,7 +293,7 @@ class ZeroApp extends ZeroFrame {
 				{ col: "merger_category", score: 4 },
 				{ col: "creator", score: 3 },
 				{ col: "description", score: 2 },
-				{ col: "bookmarkCount", select: this.subQueryBookmarks(), inSearchMatchesAdded: false, inSearchMatchesOrderBy: false, score: 6 } // TODO: Rename inSearchMatchesAdded, and isSearchMatchesOrderBy
+				{ skip: !app.userInfo || !app.userInfo.auth_address, col: "bookmarkCount", select: this.subQueryBookmarks(), inSearchMatchesAdded: false, inSearchMatchesOrderBy: false, score: 6 } // TODO: Rename inSearchMatchesAdded, and isSearchMatchesOrderBy
 			],
 			table: "zites",
 			where: app.userInfo && app.userInfo.auth_address ? "bookmarkCount >= 1" : "",

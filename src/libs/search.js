@@ -62,17 +62,20 @@ function searchDbQuery(zeroframe, searchQuery, options) {
         var matchName = options.searchSelects[i].matchName;
         var inSearchMatchesAdded = options.searchSelects[i].inSearchMatchesAdded != undefined ? options.searchSelects[i].inSearchMatchesAdded : true;
         var inSearchMatchesOrderBy = options.searchSelects[i].inSearchMatchesOrderBy != undefined ? options.searchSelects[i].inSearchMatchesOrderBy : true;
+        var skip = options.searchSelects[i].skip != undefined ? options.searchSelects[i].skip : false;
 
-        if (select) {
-            searchSelects += "(" + select + ") AS " + col;
-        } else {
-            searchSelects += matchExpressions_inner(col);
-        }
-        if (i != options.searchSelects.length - 1) {
-            searchSelects += ", ";
+        if (!skip) {
+            if (i != 0) {
+                searchSelects += ", ";
+            }
+            if (select) {
+                searchSelects += "(" + select + ") AS " + col;
+            } else {
+                searchSelects += matchExpressions_inner(col);
+            }
         }
 
-        if (inSearchMatchesAdded) {
+        if (inSearchMatchesAdded && !skip) {
             if (i != 0) {
                 searchMatchesAdded += " + ";
             }
@@ -86,7 +89,7 @@ function searchDbQuery(zeroframe, searchQuery, options) {
         if (options.orderByScore) {
             if (searchMatchesOrderBy == "")
                 searchMatchesOrderBy = "(";
-            if (inSearchMatchesOrderBy) {
+            if (inSearchMatchesOrderBy && !skip) {
                 if (i != 0) {
                     searchMatchesOrderBy += " + ";
                 }
