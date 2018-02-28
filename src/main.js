@@ -12,6 +12,7 @@ md = new MarkdownIt({
 
 var ZeroFrame = require("./libs/ZeroFrame.js");
 var Router = require("./libs/router.js");
+var searchDbQuery = require("./libs/search.js");
 
 var Vue = require("vue/dist/vue.min.js");
 
@@ -173,6 +174,32 @@ class ZeroApp extends ZeroFrame {
 			`;
 		return page.cmdp("dbQuery", [query]);
 	}
+
+	/*getBookmarkZitesSearchTest(searchQuery) {
+		searchQuery(this, searchQuery, {
+			table: "zites",
+			select: "*",
+			join: "LEFT JOIN json USING (json_id)",
+			searchSelects: [ // TODO: call this something else?
+				{ col: "title", score: 5 },
+				{ col: "domain", score: 5 },
+				{ col: "address", score: 5 },
+				{ col: "tags", score: 4 },
+				{ col: "category_slug", score: 4 },
+				{ col: "merger_category", score: 4 },
+				{ col: "creator", score: 3 },
+				{ col: "description", score: 2 }
+			],
+			isStrict: false, // default: false
+			orderByScore: true, // default: true, if false, it will only show the results that have matches without ordering
+			orderDirection: "DESC", // default: DESC
+			page: 0,
+			limit: 8,
+			where: "directory='users/" + app.userInfo.auth_address + "'",
+			orderBy: "" // TODO: Addition order by's; How do we distinguish if before order by score or after order by score?
+		});
+	}*/
+
 	/*likeExpression(row) {
 		var expression = "";
 		for (var i = 0; i < searchWords.length; i++) {
@@ -205,7 +232,7 @@ class ZeroApp extends ZeroFrame {
 			}
 			return expressions;
 		}
-	};
+	}
 
 	matches(searchWords) {
 		return (row, multiplication) => {
@@ -226,7 +253,7 @@ class ZeroApp extends ZeroFrame {
 
 	subQueryBookmarks() {
 		var s = `
-			(SELECT DISTINCT COUNT(*) FROM bookmarks LEFT JOIN json AS bookmarksjson USING (json_id) WHERE zites.id=bookmarks.reference_id AND bookmarksjson.directory='users/${app.userInfo.auth_address}') AS bookmarkCount
+			SELECT DISTINCT COUNT(*) FROM bookmarks LEFT JOIN json AS bookmarksjson USING (json_id) WHERE zites.id=bookmarks.reference_id AND bookmarksjson.directory='users/${app.userInfo.auth_address}'
 			`;
 		return s;
 	}
@@ -310,6 +337,27 @@ class ZeroApp extends ZeroFrame {
 
 
 	getZitesSearch(searchQuery, pageNum = 0, limit = 8) {
+
+		return searchDbQuery(this, searchQuery, {
+			orderByScore: true,
+			select: "*",
+			searchSelects: [
+				{ col: "title", score: 5 },
+				{ col: "domain", score: 5 },
+				{ col: "address", score: 5 },
+				{ col: "tags", score: 4 },
+				{ col: "category_slug", score: 4 },
+				{ col: "merger_category", score: 4 },
+				{ col: "creator", score: 3 },
+				{ col: "description", score: 2 },
+				{ col: "bookmarkCount", select: this.subQueryBookmarks(), inSearchMatchesAdded: false, inSearchMatchesOrderBy: false, score: 6 } // TODO: Rename inSearchMatchesAdded, and isSearchMatchesOrderBy
+			],
+			table: "zites",
+			join: "LEFT JOIN json USING (json_id)",
+			page: pageNum,
+			limit: limit
+		});
+
 		const offset = pageNum * limit;
 		var searchWords = searchQuery.split(" ");
 
