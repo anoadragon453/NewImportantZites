@@ -60,6 +60,7 @@
 		name: "mainapp",
 		data: () => {
 			return {
+				firstUpdate: false,
 				categoriesSidebar: categoriesSidebar,
 				zite_list_item: ziteListItem,
 				zites: [],
@@ -74,14 +75,16 @@
 			if (Router.currentParams["page"])
 				this.pageNum = parseInt(Router.currentParams["page"]);
 
-			if (this.userInfo) {
-				this.getZites();
-			}
+			this.firstUpdate = true;
+			this.getZites();
 			this.getCategories();
 			
 			this.$parent.$on("update", function() {
 				//self.getQuestions();
-				self.getZites();
+				if (!self.firstUpdate) {
+					self.getZites();
+					self.firstUpdate = false;
+				}
 			});
 		},
 		mounted: function() {
