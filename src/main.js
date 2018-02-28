@@ -125,17 +125,6 @@ class ZeroApp extends ZeroFrame {
 		return page.cmdp("dbQuery", [query]);
 	}
 
-	getZiteByAddress(address) {
-		var query = `
-			SELECT *
-			FROM zites
-			LEFT JOIN json USING (json_id)
-			WHERE address='${address}'
-			LIMIT 1
-			`;
-		return page.cmdp("dbQuery", [query]);
-	}
-	
 	getZite(auth_address, id) {
 		var query = `
 			SELECT *
@@ -148,6 +137,17 @@ class ZeroApp extends ZeroFrame {
 		return page.cmdp("dbQuery", [query]);
 	}
 
+	getZiteByAddress(address) {
+		var query = `
+			SELECT *
+			FROM zites
+			LEFT JOIN json USING (json_id)
+			WHERE address='${address}'
+			LIMIT 1
+			`;
+		return page.cmdp("dbQuery", [query]);
+	}
+
 	getZites(pageNum = 0, limit = 8) {
 		const offset = pageNum * limit;
 		var query = `
@@ -155,6 +155,20 @@ class ZeroApp extends ZeroFrame {
 				${app.userInfo && app.userInfo.auth_address ? ", " + this.subQueryBookmarks() : ""}
 			FROM zites
 			LEFT JOIN json USING (json_id)
+			LIMIT ${limit}
+			OFFSET ${offset}
+			`;
+		return page.cmdp("dbQuery", [query]);
+	}
+
+	getZitesInCategory(categorySlug, pageNum = 0, limit = 8) {
+		const offset = pageNum * limit;
+		var query = `
+			SELECT *
+				${app.userInfo && app.userInfo.auth_address ? ", " + this.subQueryBookmarks() : ""}
+			FROM zites
+			LEFT JOIN json USING (json_id)
+			WHERE category_slug="${categorySlug}"
 			LIMIT ${limit}
 			OFFSET ${offset}
 			`;
@@ -175,12 +189,12 @@ class ZeroApp extends ZeroFrame {
 		return page.cmdp("dbQuery", [query]);
 	}
 
-	/*getBookmarkZitesSearchTest(searchQuery) {
-		searchQuery(this, searchQuery, {
-			table: "zites",
+	// TODO: Username/id at multiplication of 1
+	getZitesSearch(searchQuery, pageNum = 0, limit = 8) {
+		return searchDbQuery(this, searchQuery, {
+			orderByScore: true,
 			select: "*",
-			join: "LEFT JOIN json USING (json_id)",
-			searchSelects: [ // TODO: call this something else?
+			searchSelects: [
 				{ col: "title", score: 5 },
 				{ col: "domain", score: 5 },
 				{ col: "address", score: 5 },
@@ -188,67 +202,37 @@ class ZeroApp extends ZeroFrame {
 				{ col: "category_slug", score: 4 },
 				{ col: "merger_category", score: 4 },
 				{ col: "creator", score: 3 },
-				{ col: "description", score: 2 }
+				{ col: "description", score: 2 },
+				{ col: "bookmarkCount", select: this.subQueryBookmarks(), inSearchMatchesAdded: false, inSearchMatchesOrderBy: true, score: 6 } // TODO: Rename inSearchMatchesAdded, and isSearchMatchesOrderBy
 			],
-			isStrict: false, // default: false
-			orderByScore: true, // default: true, if false, it will only show the results that have matches without ordering
-			orderDirection: "DESC", // default: DESC
-			page: 0,
-			limit: 8,
-			where: "directory='users/" + app.userInfo.auth_address + "'",
-			orderBy: "" // TODO: Addition order by's; How do we distinguish if before order by score or after order by score?
+			table: "zites",
+			join: "LEFT JOIN json USING (json_id)",
+			page: pageNum,
+			limit: limit
 		});
-	}*/
-
-	/*likeExpression(row) {
-		var expression = "";
-		for (var i = 0; i < searchWords.length; i++) {
-			var word = searchWords[i];
-			if (i == searchWords.length - 1) {
-				expression += row + " LIKE '%" + word + "%'";
-			} else {
-				expression += row + " LIKE '%" + word + "%' OR ";
-			}
-		}
-		console.log(expression);
-		return expression;
-	}*/
-
-	matchExpressions(searchWords) {
-		return (row) => {
-			var expressions = "";
-			for (var i = 0; i < searchWords.length; i++) {
-				var word = searchWords[i].replace(/'/g, "''").replace(/%/g, "[%]");
-				var negate = false;
-				if (word[0] == "-") {
-					negate = true;
-					word = word.slice(1);
-					console.log(word);
-				}
-				expressions += "(SELECT COUNT(" + row + ") FROM zites AS " + row + "match" + i + " WHERE " + row + (negate ? " NOT" : "") + " LIKE '%" + word + "%' AND zites." + row + "=" + row + "match" + i + "." + row + " AND zites.id=" + row + "match" + i + ".id AND zites.json_id=" + row + "match" + i + ".json_id) AS " + row + "match" + i;
-				if (i != searchWords.length - 1) {
-					expressions += ", ";
-				}
-			}
-			return expressions;
-		}
 	}
 
-	matches(searchWords) {
-		return (row, multiplication) => {
-			var s = "";
-			for (var i = 0; i < searchWords.length; i++) {
-				if (!multiplication) {
-					s += row + "match" + i;
-				} else {
-					s += "(" + row + "match" + i + " * " + multiplication + ")";
-				}
-				if (i != searchWords.length - 1) {
-					s += " + ";
-				}
-			}
-			return s;
-		}
+	getZitesInCategorySearch(categorySlug, searchQuery, pageNum = 0, limit = 8) {
+		return searchDbQuery(this, searchQuery, {
+			orderByScore: true,
+			select: "*",
+			searchSelects: [
+				{ col: "title", score: 5 },
+				{ col: "domain", score: 5 },
+				{ col: "address", score: 5 },
+				{ col: "tags", score: 4 },
+				{ col: "category_slug", score: 4 },
+				{ col: "merger_category", score: 4 },
+				{ col: "creator", score: 3 },
+				{ col: "description", score: 2 },
+				{ col: "bookmarkCount", select: this.subQueryBookmarks(), inSearchMatchesAdded: false, inSearchMatchesOrderBy: true, score: 6 } // TODO: Rename inSearchMatchesAdded, and isSearchMatchesOrderBy
+			],
+			table: "zites",
+			where: "category_slug='" + categorySlug + "'",
+			join: "LEFT JOIN json USING (json_id)",
+			page: pageNum,
+			limit: limit
+		});
 	}
 
 	subQueryBookmarks() {
@@ -260,84 +244,36 @@ class ZeroApp extends ZeroFrame {
 
 	getMyZitesSearch(searchQuery, pageNum = 0, limit = 8) {
 		if (!this.siteInfo.cert_user_id) {
-    		return this.cmdp("wrapperNotification", ["error", "You must be logged in to add a zite."]);
+    		return this.cmdp("wrapperNotification", ["error", "You must be logged in to see your zites."]);
 		}
 
-		const offset = pageNum * limit;
-		var searchWords = searchQuery.split(" ");
-
-		var matchExpressions = this.matchExpressions(searchWords);
-		var matches = this.matches(searchWords);
-		
-		// TODO: Username/id at multiplication of 1
-		// description 2
-		// creator - 3
-		// tags, category_slug - 4
-		// title, domain, address - 5
-		var query = `
-			SELECT *,
-				${matchExpressions('title')}, ${matchExpressions('domain')}, ${matchExpressions('address')},
-				${matchExpressions('tags')}, ${matchExpressions('category_slug')}, ${matchExpressions('merger_category')},
-				${matchExpressions('creator')},
-				${matchExpressions('description')}
-			FROM zites
-			LEFT JOIN json USING (json_id)
-			WHERE (${matches('title')} + ${matches('domain')} + ${matches('address')} 
-				+ ${matches('tags')} + ${matches('category_slug')} + ${matches('merger_category')} 
-				+ ${matches('creator')} 
-				+ ${matches('description')}) > 0
-				AND directory='users/${app.userInfo.auth_address}'
-			ORDER BY (${matches('title', 5)} + ${matches('domain', 5)} + ${matches('address', 5)}
-				+ ${matches('tags', 4)} + ${matches('category_slug', 4)} + ${matches('merger_category', 4)}
-				+ ${matches('creator', 3)} 
-				+ ${matches('description', 2)}) DESC
-			LIMIT ${limit}
-			OFFSET ${offset}
-			`;
-		console.log(query);
-		return page.cmdp("dbQuery", [query]);
+		return searchDbQuery(this, searchQuery, {
+			orderByScore: true,
+			select: "*",
+			searchSelects: [
+				{ col: "title", score: 5 },
+				{ col: "domain", score: 5 },
+				{ col: "address", score: 5 },
+				{ col: "tags", score: 4 },
+				{ col: "category_slug", score: 4 },
+				{ col: "merger_category", score: 4 },
+				{ col: "creator", score: 3 },
+				{ col: "description", score: 2 },
+				{ col: "bookmarkCount", select: this.subQueryBookmarks(), inSearchMatchesAdded: false, inSearchMatchesOrderBy: true, score: 6 } // TODO: Rename inSearchMatchesAdded, and isSearchMatchesOrderBy
+			],
+			table: "zites",
+			where: "directory='users/" + app.userInfo.auth_address + "'",
+			join: "LEFT JOIN json USING (json_id)",
+			page: pageNum,
+			limit: limit
+		});
 	}
 
 	getBookmarkZitesSearch(searchQuery, pageNum = 0, limit = 8) {
-		const offset = pageNum * limit;
-		var searchWords = searchQuery.split(" ");
-
-		var matchExpressions = this.matchExpressions(searchWords);
-		var matches = this.matches(searchWords);
+		if (!this.siteInfo.cert_user_id) {
+    		return this.cmdp("wrapperNotification", ["error", "You must be logged in to see your bookmarks."]);
+		}
 		
-		// TODO: Username/id at multiplication of 1
-		// description 2
-		// creator - 3
-		// tags, category_slug - 4
-		// title, domain, address - 5
-		var query = `
-			SELECT *,
-				${matchExpressions('title')}, ${matchExpressions('domain')}, ${matchExpressions('address')},
-				${matchExpressions('tags')}, ${matchExpressions('category_slug')}, ${matchExpressions('merger_category')},
-				${matchExpressions('creator')},
-				${matchExpressions('description')}
-				${app.userInfo && app.userInfo.auth_address ? ", " + this.subQueryBookmarks() : ""}
-			FROM zites
-			LEFT JOIN json USING (json_id)
-			WHERE (${matches('title')} + ${matches('domain')} + ${matches('address')} 
-				+ ${matches('tags')} + ${matches('category_slug')} + ${matches('merger_category')} 
-				+ ${matches('creator')} 
-				+ ${matches('description')}) > 0
-				${app.userInfo && app.userInfo.auth_address ? " AND bookmarkCount >= 1" : ""}
-			ORDER BY   (${matches('title', 5)} + ${matches('domain', 5)} + ${matches('address', 5)}
-				+ ${matches('tags', 4)} + ${matches('category_slug', 4)} + ${matches('merger_category', 4)}
-				+ ${matches('creator', 3)} 
-				+ ${matches('description', 2)}) DESC
-			LIMIT ${limit}
-			OFFSET ${offset}
-			`;
-		console.log(query);
-		return page.cmdp("dbQuery", [query]);
-	}
-
-
-	getZitesSearch(searchQuery, pageNum = 0, limit = 8) {
-
 		return searchDbQuery(this, searchQuery, {
 			orderByScore: true,
 			select: "*",
@@ -353,89 +289,11 @@ class ZeroApp extends ZeroFrame {
 				{ col: "bookmarkCount", select: this.subQueryBookmarks(), inSearchMatchesAdded: false, inSearchMatchesOrderBy: false, score: 6 } // TODO: Rename inSearchMatchesAdded, and isSearchMatchesOrderBy
 			],
 			table: "zites",
+			where: app.userInfo && app.userInfo.auth_address ? "bookmarkCount >= 1" : "",
 			join: "LEFT JOIN json USING (json_id)",
 			page: pageNum,
 			limit: limit
 		});
-
-		const offset = pageNum * limit;
-		var searchWords = searchQuery.split(" ");
-
-		var matchExpressions = this.matchExpressions(searchWords);
-		var matches = this.matches(searchWords);
-		
-		// TODO: Username/id at multiplication of 1
-		// description 2
-		// creator - 3
-		// tags, category_slug - 4
-		// title, domain, address - 5
-		var query = `
-			SELECT *,
-				${matchExpressions('title')}, ${matchExpressions('domain')}, ${matchExpressions('address')},
-				${matchExpressions('tags')}, ${matchExpressions('category_slug')}, ${matchExpressions('merger_category')},
-				${matchExpressions('creator')},
-				${matchExpressions('description')}
-				${app.userInfo && app.userInfo.auth_address ? ", " + this.subQueryBookmarks() : ""}
-			FROM zites
-			LEFT JOIN json USING (json_id)
-			WHERE (${matches('title')} + ${matches('domain')} + ${matches('address')} 
-				+ ${matches('tags')} + ${matches('category_slug')} + ${matches('merger_category')} 
-				+ ${matches('creator')} 
-				+ ${matches('description')}) > 0
-			ORDER BY   (${matches('title', 5)} + ${matches('domain', 5)} + ${matches('address', 5)}
-				+ ${matches('tags', 4)} + ${matches('category_slug', 4)} + ${matches('merger_category', 4)}
-				+ ${matches('creator', 3)} 
-				+ ${matches('description', 2)} ${app.userInfo && app.userInfo.auth_address ? " + (bookmarkCount * 6)" : ""}) DESC
-			LIMIT ${limit}
-			OFFSET ${offset}
-			`;
-		console.log(query);
-		return page.cmdp("dbQuery", [query]);
-	}
-
-	getZitesInCategory(categorySlug, pageNum = 0, limit = 8) {
-		const offset = pageNum * limit;
-		var query = `
-			SELECT *
-				${app.userInfo && app.userInfo.auth_address ? ", " + this.subQueryBookmarks() : ""}
-			FROM zites
-			LEFT JOIN json USING (json_id)
-			WHERE category_slug="${categorySlug}"
-			LIMIT ${limit}
-			OFFSET ${offset}
-			`;
-		return page.cmdp("dbQuery", [query]);
-	}
-
-	getZitesInCategorySearch(categorySlug, searchQuery, pageNum = 0, limit = 8) {
-		const offset = pageNum * limit;
-		var searchWords = searchQuery.split(" ");
-
-		var matchExpressions = this.matchExpressions(searchWords);
-		var matches = this.matches(searchWords);
-
-		var query = `
-			SELECT *,
-				${matchExpressions('title')}, ${matchExpressions('domain')}, ${matchExpressions('address')},
-				${matchExpressions('tags')}, ${matchExpressions('category_slug')}, ${matchExpressions('merger_category')},
-				${matchExpressions('creator')},
-				${matchExpressions('description')}
-				${app.userInfo && app.userInfo.auth_address ? ", " + this.subQueryBookmarks() : ""}
-			FROM zites
-			LEFT JOIN json USING (json_id)
-			WHERE category_slug="${categorySlug}" AND
-				(${matches('title')} + ${matches('domain')} + ${matches('address')} 
-				+ ${matches('tags')} + ${matches('category_slug')} + ${matches('merger_category')} 
-				+ ${matches('creator')} 
-				+ ${matches('description')}) > 0
-			ORDER BY (${matches('title', 5)} + ${matches('domain', 5)} + ${matches('address', 5)}
-				+ ${matches('tags', 4)} + ${matches('category_slug', 4)} + ${matches('merger_category', 4)}
-				+ ${matches('creator', 3)} 
-				+ ${matches('description', 2)} ${app.userInfo && app.userInfo.auth_address ? " + (bookmarkCount * 6)" : ""}) DESC
-			LIMIT ${limit}
-			OFFSET ${offset}
-			`;
-		return page.cmdp("dbQuery", [query]);
 	}
 
 	// merger_supported :: bool
