@@ -4,6 +4,7 @@
 			<li><a href="./?/" v-on:click.prevent="goto('')">Home</a></li>
 			<li v-for="link in userLinks" v-if="isLoggedIn">
 				<a :href="'./?/' + link.route" v-on:click.prevent="navbarLinkClick(link)">{{ link.name }}</a>
+				<a href="./?/admin" v-on:click.prevent="goto('admin')" v-if="userInfo && userInfo.privatekey">Admin</a>
 			</li>
 			<li class="divider"></li>
 			<!-- TODO -->
@@ -43,6 +44,9 @@
 						<li v-else><a v-on:click.prevent="">{{ userInfo ? userInfo.cert_user_id : "" }}</a></li>
 						<li v-for="category in categories">
 							<a :href="'./?/category' + category.slug">{{ category.name }}</a>
+						</li>
+						<li v-if="userInfo && userInfo.privatekey">
+							<a href="./?/admin" v-on:click.prevent="goto('admin')" v-if="userInfo && userInfo.privatekey">Admin</a>
 						</li>
 					</ul>
 				</div>

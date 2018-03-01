@@ -39,6 +39,7 @@ var app = new Vue({
 	},
 	methods: {
 		getUserInfo: function(f = null) {
+			console.log(this.siteInfo);
             if (this.siteInfo == null || this.siteInfo.cert_user_id == null) {
                 this.userInfo = null;
 				this.$emit("setuserinfo", this.userInfo);
@@ -49,6 +50,7 @@ var app = new Vue({
             var that = this;
 
             that.userInfo = {
+				privatekey: that.siteInfo.privatekey,
                 cert_user_id: that.siteInfo.cert_user_id,
                 auth_address: that.siteInfo.auth_address//,
                 //keyvalue: keyvalue
@@ -451,6 +453,83 @@ class ZeroApp extends ZeroFrame {
 	    	});
 	}
 
+	editZiteAdmin(auth_address, id, title, address, domain, creator, description, tags, category_slug, merger_supported, merger_category, beforePublishCB) {
+		if (!this.siteInfo.privatekey) {
+    		return this.cmdp("wrapperNotification", ["error", "You must be an admin to edit this zite."]);
+    	}
+
+    	var data_inner_path = "data/users/" + auth_address + "/data.json";
+    	var content_inner_path = "data/users/" + auth_address + "/content.json";
+
+    	var self = this;
+    	return this.cmdp("fileGet", { "inner_path": data_inner_path, "required": false })
+    		.then((data) => {
+    			data = JSON.parse(data);
+    			if (!data) {
+					console.log("Error!");
+					return;
+    			}
+
+    			if (!data["zites"]) {
+					console.log("Error!");
+					return;
+				}
+
+				var date = Date.now();
+				
+				var slug = title.toLowerCase().replace(/\s*/g, "_").replace(/(\.|\:)/g, "-").replace(/[^a-zA-Z0-9-]/g, "");
+
+				address = address.replace(/((https?|zero|zeronet)\:\/\/|(127\.0\.0\.1|192\.168\.0\.[0-9]+)(\:[0-9]+)?\/?|localhost|.*(\.(com|net|org|tk|uk|eu|co))+(\:[0-9]+)?\/?|zero\/)/g, "").replace(/(\?|#)\/?$/, "").replace(/\/$/g, "");
+				domain = domain.replace(/((https?|zero|zeronet)\:\/\/|(127\.0\.0\.1|192\.168\.0\.[0-9]+)(\:[0-9]+)?\/?|localhost|.*(\.(com|net|org|tk|uk|eu|co))+(\:[0-9]+)?\/?|zero\/)/g, "").replace(/(\?|#)\/?$/, "").replace(/\/$/g, "");
+				title = title.replace(/((https?|zero|zeronet)\:\/\/|(127\.0\.0\.1|192\.168\.0\.[0-9]+)(\:[0-9]+)?\/?|localhost|.*(\.(com|net|org|tk|uk|eu|co))+(\:[0-9]+)?\/?|zero\/)/g, "").replace(/(\?|#)\/?$/, "").replace(/\.bit/g, "").replace(/(#.*|\?.*)/g, "").replace(/\/$/g, "");
+				merger_category = merger_category.replace(/(merged|merger)-/g, "");
+				creator = creator.replace(/(.)@.*$/g, "$1");
+
+				for (var i in data["zites"]) {
+					var zite = data["zites"][i];
+					if (zite.id == id) {
+						data["zites"][i].title = title.trim();
+						data["zites"][i].address = address.trim();
+						data["zites"][i].domain = domain.trim();
+						data["zites"][i].creator = creator.trim();
+						data["zites"][i].slug = slug.trim();
+						data["zites"][i].description = description.trim();
+						data["zites"][i].category_slug = category_slug;
+						data["zites"][i].tags = tags.trim();
+						data["zites"][i].merger_supported = merger_supported;
+						data["zites"][i].merger_category = merger_category.trim();
+						data["zites"][i].date_updated = date;
+						break;
+					}
+				}
+
+    			var json_raw = unescape(encodeURIComponent(JSON.stringify(data, undefined, '\t')));
+
+    			return self.cmdp("fileWrite", [data_inner_path, btoa(json_raw)])
+					.then((res) => {
+		    			if (res === "ok") {
+		    				return self.cmdp("siteSign", ["stored", content_inner_path])
+		    					.then((res) => {
+		    						if (res === "ok") {
+		    							if (beforePublishCB != null && typeof beforePublishCB === "function") beforePublishCB({ "id": date, "auth_address": auth_address });
+		    							return self.cmdp("sitePublish", { "inner_path": content_inner_path, "sign": false })
+		    								.then(() => {
+		    									return { "id": date, "auth_address": auth_address };
+		    								}).catch((err) => {
+                                                console.log(err);
+                                                return { "id": date, "auth_address": auth_address, "err": err };
+                                            });
+		    						} else {
+		    							return self.cmdp("wrapperNotification", ["error", "Failed to sign user data."]);
+		    						}
+		    					});
+		    			} else {
+		    				return self.cmdp("wrapperNotification", ["error", "Failed to write to data file."]);
+		    			}
+		    		});
+	    	});
+	}
+
 	addBookmark(reference_id, reference_auth_address, beforePublishCB) {
 		if (!this.siteInfo.cert_user_id) {
     		return this.cmdp("wrapperNotification", ["error", "You must be logged in to add a zite."]);
@@ -583,8 +662,12 @@ var EditZite = require("./router_pages/edit-zite.vue");
 var MyZites = require("./router_pages/my-zites.vue");
 var MyBookmarks = require("./router_pages/my-bookmarks.vue");
 var CategoryPage = require("./router_pages/categoryPage.vue");
+var Admin = require("./router_pages/admin.vue");
+var EditZiteAdmin = require("./router_pages/edit-zite-admin.vue");
 
 VueZeroFrameRouter.VueZeroFrameRouter_Init(Router, app, [
+	{ route: "admin/edit/:authaddress/:ziteid", component: EditZiteAdmin },
+	{ route: "admin", component: Admin },
 	{ route: "about", component: About },
 	{ route: "my-bookmarks", component: MyBookmarks },
 	{ route: "my-zites", component: MyZites },
