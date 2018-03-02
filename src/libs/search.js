@@ -1,4 +1,4 @@
-function matchExpressions(searchWords) {
+function matchExpressions(searchWords, table, id_col) {
     return (row) => {
         var expressions = "";
         for (var i = 0; i < searchWords.length; i++) {
@@ -9,7 +9,7 @@ function matchExpressions(searchWords) {
                 word = word.slice(1);
                 console.log(word);
             }
-            expressions += "(SELECT COUNT(" + row + ") FROM zites AS " + row + "match" + i + " WHERE " + row + (negate ? " NOT" : "") + " LIKE '%" + word + "%' AND zites." + row + "=" + row + "match" + i + "." + row + " AND zites.id=" + row + "match" + i + ".id AND zites.json_id=" + row + "match" + i + ".json_id) AS " + row + "match" + i;
+            expressions += "(SELECT COUNT(" + row + ") FROM " + table + " AS " + row + "match" + i + " WHERE " + row + (negate ? " NOT" : "") + " LIKE '%" + word + "%' AND " + table + "." + row + "=" + row + "match" + i + "." + row + " AND " + table + "." + id_col + "=" + row + "match" + i + "." + id_col + " AND " + table + ".json_id=" + row + "match" + i + ".json_id) AS " + row + "match" + i;
             if (i != searchWords.length - 1) {
                 expressions += ", ";
             }
@@ -49,7 +49,7 @@ function searchDbQuery(zeroframe, searchQuery, options) {
 
     if (searchWords.length == 0) searchWords = [""];
 
-    var matchExpressions_inner = matchExpressions(searchWords);
+    var matchExpressions_inner = matchExpressions(searchWords, options.table, options.id_col);
     var matches_inner = matches(searchWords);
 
     var searchSelects = "";
@@ -104,6 +104,19 @@ function searchDbQuery(zeroframe, searchQuery, options) {
 
     searchMatchesOrderBy += ") " + (options.orderDirection || "DESC");
 
+    var beforeOrderBy = "";
+    var afterOrderBy = "";
+    if (options.beforeOrderBy) {
+        beforeOrderBy = options.beforeOrderBy + ", ";
+    }
+    if (options.afterOrderBy) {
+        if (options.orderByScore && searchMatchesOrderBy) {
+            afterOrderBy = ", " + options.afterOrderBy;
+        } else {
+            afterOrderBy = "ORDER BY " + options.afterOrderBy;
+        }
+    }
+
     var query = `
         SELECT ${options.select || "*"}
             ${searchSelects ? ", " + searchSelects : ""}
@@ -112,7 +125,7 @@ function searchDbQuery(zeroframe, searchQuery, options) {
         WHERE ${options.where || ""}
             ${options.where && searchMatchesAdded ? "AND" : ""}
             ${searchMatchesAdded ? "(" + searchMatchesAdded + ") > 0" : ""}
-        ${options.orderByScore && searchMatchesOrderBy ? "ORDER BY " + searchMatchesOrderBy : ""}
+        ${options.orderByScore && searchMatchesOrderBy ? "ORDER BY " + beforeOrderBy + searchMatchesOrderBy : ""} ${afterOrderBy}
         ${options.limit ? "LIMIT " + options.limit : ""}
         ${options.limit ? "OFFSET " + offset : ""}
         `;

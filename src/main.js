@@ -207,6 +207,7 @@ class ZeroApp extends ZeroFrame {
 	getZitesSearch(searchQuery, pageNum = 0, limit = 8) {
 		var query = searchDbQuery(this, searchQuery, {
 			orderByScore: true,
+			id_col: "id",
 			select: "*",
 			searchSelects: [
 				{ col: "title", score: 5 },
@@ -230,6 +231,7 @@ class ZeroApp extends ZeroFrame {
 	getZitesInCategorySearch(categorySlug, searchQuery, pageNum = 0, limit = 8) {
 		var query = searchDbQuery(this, searchQuery, {
 			orderByScore: true,
+			id_col: "id",
 			select: "*",
 			searchSelects: [
 				{ col: "title", score: 5 },
@@ -259,6 +261,7 @@ class ZeroApp extends ZeroFrame {
 
 		var query = searchDbQuery(this, searchQuery, {
 			orderByScore: true,
+			id_col: "id",
 			select: "*",
 			searchSelects: [
 				{ col: "title", score: 5 },
@@ -287,6 +290,7 @@ class ZeroApp extends ZeroFrame {
 		
 		var query = searchDbQuery(this, searchQuery, {
 			orderByScore: true,
+			id_col: "id",
 			select: "*",
 			searchSelects: [
 				{ col: "title", score: 5 },
