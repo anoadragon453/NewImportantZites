@@ -453,6 +453,65 @@ class ZeroApp extends ZeroFrame {
 	    	});
 	}
 
+	deleteZite(id, beforePublishCB) {
+		if (!this.siteInfo.cert_user_id) {
+    		return this.cmdp("wrapperNotification", ["error", "You must be logged in to add a zite."]);
+    	}
+
+    	var data_inner_path = "data/users/" + this.siteInfo.auth_address + "/data.json";
+    	var content_inner_path = "data/users/" + this.siteInfo.auth_address + "/content.json";
+
+    	var self = this;
+    	return this.cmdp("fileGet", { "inner_path": data_inner_path, "required": false })
+    		.then((data) => {
+    			data = JSON.parse(data);
+    			if (!data) {
+					console.log("Error!");
+					return;
+    			}
+
+    			if (!data["zites"]) {
+					console.log("Error!");
+					return;
+				}
+
+				var date = Date.now();
+				
+				for (var i in data["zites"]) {
+					var zite = data["zites"][i];
+					if (zite.id == id) {
+						data["zites"].splice(i, 1);
+						break;
+					}
+				}
+
+    			var json_raw = unescape(encodeURIComponent(JSON.stringify(data, undefined, '\t')));
+
+    			return self.cmdp("fileWrite", [data_inner_path, btoa(json_raw)])
+					.then((res) => {
+		    			if (res === "ok") {
+		    				return self.cmdp("siteSign", { "inner_path": content_inner_path })
+		    					.then((res) => {
+		    						if (res === "ok") {
+		    							if (beforePublishCB != null && typeof beforePublishCB === "function") beforePublishCB({ "id": id, "auth_address": self.siteInfo.auth_address });
+		    							return self.cmdp("sitePublish", { "inner_path": content_inner_path, "sign": false })
+		    								.then(() => {
+		    									return { "id": id, "auth_address": self.siteInfo.auth_address };
+		    								}).catch((err) => {
+                                                console.log(err);
+                                                return { "id": id, "auth_address": self.siteInfo.auth_address, "err": err };
+                                            });
+		    						} else {
+		    							return self.cmdp("wrapperNotification", ["error", "Failed to sign user data."]);
+		    						}
+		    					});
+		    			} else {
+		    				return self.cmdp("wrapperNotification", ["error", "Failed to write to data file."]);
+		    			}
+		    		});
+	    	});
+	}
+
 	editZiteAdmin(auth_address, id, title, address, domain, creator, description, tags, category_slug, merger_supported, merger_category, beforePublishCB) {
 		if (!this.siteInfo.privatekey) {
     		return this.cmdp("wrapperNotification", ["error", "You must be an admin to edit this zite."]);
@@ -499,6 +558,63 @@ class ZeroApp extends ZeroFrame {
 						data["zites"][i].merger_supported = merger_supported;
 						data["zites"][i].merger_category = merger_category.trim();
 						data["zites"][i].date_updated = date;
+						break;
+					}
+				}
+
+    			var json_raw = unescape(encodeURIComponent(JSON.stringify(data, undefined, '\t')));
+
+    			return self.cmdp("fileWrite", [data_inner_path, btoa(json_raw)])
+					.then((res) => {
+		    			if (res === "ok") {
+		    				return self.cmdp("siteSign", ["stored", content_inner_path])
+		    					.then((res) => {
+		    						if (res === "ok") {
+		    							if (beforePublishCB != null && typeof beforePublishCB === "function") beforePublishCB({ "id": id, "auth_address": auth_address });
+		    							return self.cmdp("sitePublish", { "inner_path": content_inner_path, "sign": false })
+		    								.then(() => {
+		    									return { "id": id, "auth_address": auth_address };
+		    								}).catch((err) => {
+                                                console.log(err);
+                                                return { "id": id, "auth_address": auth_address, "err": err };
+                                            });
+		    						} else {
+		    							return self.cmdp("wrapperNotification", ["error", "Failed to sign user data."]);
+		    						}
+		    					});
+		    			} else {
+		    				return self.cmdp("wrapperNotification", ["error", "Failed to write to data file."]);
+		    			}
+		    		});
+	    	});
+	}
+
+	deleteZiteAdmin(auth_address, id, beforePublishCB) {
+		if (!this.siteInfo.privatekey) {
+    		return this.cmdp("wrapperNotification", ["error", "You must be an admin to edit this zite."]);
+    	}
+
+    	var data_inner_path = "data/users/" + auth_address + "/data.json";
+    	var content_inner_path = "data/users/" + auth_address + "/content.json";
+
+    	var self = this;
+    	return this.cmdp("fileGet", { "inner_path": data_inner_path, "required": false })
+    		.then((data) => {
+    			data = JSON.parse(data);
+    			if (!data) {
+					console.log("Error!");
+					return;
+    			}
+
+    			if (!data["zites"]) {
+					console.log("Error!");
+					return;
+				}
+
+				for (var i in data["zites"]) {
+					var zite = data["zites"][i];
+					if (zite.id == id) {
+						data["zites"].splice(i, 1);
 						break;
 					}
 				}
