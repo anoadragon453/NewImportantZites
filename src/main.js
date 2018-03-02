@@ -132,7 +132,7 @@ class ZeroApp extends ZeroFrame {
 	getZite(auth_address, id) {
 		var query = `
 			SELECT *
-				${app.userInfo && app.userInfo.auth_address ? ", " + this.subQueryBookmarks() : ""}
+				${app.userInfo && app.userInfo.auth_address ? ", (" + this.subQueryBookmarks() + ")" : ""}
 			FROM zites
 			LEFT JOIN json USING (json_id)
 			WHERE id=${id} AND json.directory='users/${auth_address}'
@@ -434,13 +434,13 @@ class ZeroApp extends ZeroFrame {
 		    				return self.cmdp("siteSign", { "inner_path": content_inner_path })
 		    					.then((res) => {
 		    						if (res === "ok") {
-		    							if (beforePublishCB != null && typeof beforePublishCB === "function") beforePublishCB({ "id": date, "auth_address": self.siteInfo.auth_address });
+		    							if (beforePublishCB != null && typeof beforePublishCB === "function") beforePublishCB({ "id": id, "auth_address": self.siteInfo.auth_address });
 		    							return self.cmdp("sitePublish", { "inner_path": content_inner_path, "sign": false })
 		    								.then(() => {
-		    									return { "id": date, "auth_address": self.siteInfo.auth_address };
+		    									return { "id": id, "auth_address": self.siteInfo.auth_address };
 		    								}).catch((err) => {
                                                 console.log(err);
-                                                return { "id": date, "auth_address": self.siteInfo.auth_address, "err": err };
+                                                return { "id": id, "auth_address": self.siteInfo.auth_address, "err": err };
                                             });
 		    						} else {
 		    							return self.cmdp("wrapperNotification", ["error", "Failed to sign user data."]);
@@ -511,13 +511,13 @@ class ZeroApp extends ZeroFrame {
 		    				return self.cmdp("siteSign", ["stored", content_inner_path])
 		    					.then((res) => {
 		    						if (res === "ok") {
-		    							if (beforePublishCB != null && typeof beforePublishCB === "function") beforePublishCB({ "id": date, "auth_address": auth_address });
+		    							if (beforePublishCB != null && typeof beforePublishCB === "function") beforePublishCB({ "id": id, "auth_address": auth_address });
 		    							return self.cmdp("sitePublish", { "inner_path": content_inner_path, "sign": false })
 		    								.then(() => {
-		    									return { "id": date, "auth_address": auth_address };
+		    									return { "id": id, "auth_address": auth_address };
 		    								}).catch((err) => {
                                                 console.log(err);
-                                                return { "id": date, "auth_address": auth_address, "err": err };
+                                                return { "id": id, "auth_address": auth_address, "err": err };
                                             });
 		    						} else {
 		    							return self.cmdp("wrapperNotification", ["error", "Failed to sign user data."]);

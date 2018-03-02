@@ -5,7 +5,7 @@
 	        	<!--<component :is="topic_navbar" active="ask" :user-info="userInfo"></component>-->
 	        	<div class="card">
 	        		<div class="card-content">
-	        			<span class="card-title">Edit Zite</span>
+	        			<span class="card-title">Admin | Edit Zite</span>
 		        		<!-- Using form so I can get html5 form validation -->
 		        		<form v-on:submit.prevent="editZite()">
 			        		<div class="input-field">

@@ -4,8 +4,9 @@
 			<li><a href="./?/" v-on:click.prevent="goto('')">Home</a></li>
 			<li v-for="link in userLinks" v-if="isLoggedIn">
 				<a :href="'./?/' + link.route" v-on:click.prevent="navbarLinkClick(link)">{{ link.name }}</a>
-				<a href="./?/admin" v-on:click.prevent="goto('admin')" v-if="userInfo && userInfo.privatekey">Admin</a>
 			</li>
+			<li class="divider"></li>
+			<li><a href="./?/admin" v-on:click.prevent="goto('admin')" v-if="userInfo && userInfo.privatekey">Admin</a></li>
 			<li class="divider"></li>
 			<!-- TODO -->
 			<!--<li><a href="#">Settings</a></li>
