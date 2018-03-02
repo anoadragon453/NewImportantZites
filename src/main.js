@@ -205,8 +205,7 @@ class ZeroApp extends ZeroFrame {
 
 	// TODO: Username/id at multiplication of 1
 	getZitesSearch(searchQuery, pageNum = 0, limit = 8) {
-		console.log(app.userInfo);
-		return searchDbQuery(this, searchQuery, {
+		var query = searchDbQuery(this, searchQuery, {
 			orderByScore: true,
 			select: "*",
 			searchSelects: [
@@ -225,10 +224,11 @@ class ZeroApp extends ZeroFrame {
 			page: pageNum,
 			limit: limit
 		});
+		return this.cmdp("dbQuery", [query]);
 	}
 
 	getZitesInCategorySearch(categorySlug, searchQuery, pageNum = 0, limit = 8) {
-		return searchDbQuery(this, searchQuery, {
+		var query = searchDbQuery(this, searchQuery, {
 			orderByScore: true,
 			select: "*",
 			searchSelects: [
@@ -248,6 +248,7 @@ class ZeroApp extends ZeroFrame {
 			page: pageNum,
 			limit: limit
 		});
+		return this.cmdp("dbQuery" [query]);
 	}
 
 
@@ -256,7 +257,7 @@ class ZeroApp extends ZeroFrame {
     		return this.cmdp("wrapperNotification", ["error", "You must be logged in to see your zites."]);
 		}
 
-		return searchDbQuery(this, searchQuery, {
+		var query = searchDbQuery(this, searchQuery, {
 			orderByScore: true,
 			select: "*",
 			searchSelects: [
@@ -276,6 +277,7 @@ class ZeroApp extends ZeroFrame {
 			page: pageNum,
 			limit: limit
 		});
+		return this.cmdp("dbQuery", [query]);
 	}
 
 	getBookmarkZitesSearch(searchQuery, pageNum = 0, limit = 8) {
@@ -283,7 +285,7 @@ class ZeroApp extends ZeroFrame {
     		return this.cmdp("wrapperNotification", ["error", "You must be logged in to see your bookmarks."]);
 		}
 		
-		return searchDbQuery(this, searchQuery, {
+		var query = searchDbQuery(this, searchQuery, {
 			orderByScore: true,
 			select: "*",
 			searchSelects: [
@@ -303,6 +305,7 @@ class ZeroApp extends ZeroFrame {
 			page: pageNum,
 			limit: limit
 		});
+		return this.cmdp("dbQuery", [query]);
 	}
 
 	// merger_supported :: bool

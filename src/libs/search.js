@@ -117,7 +117,7 @@ function searchDbQuery(zeroframe, searchQuery, options) {
         ${options.limit ? "OFFSET " + offset : ""}
         `;
     console.log(query);
-    return zeroframe.cmdp("dbQuery", [query]);
+    return query;
 }
 
 module.exports = searchDbQuery;
