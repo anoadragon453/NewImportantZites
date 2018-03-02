@@ -58,12 +58,18 @@
 			deleteZite() {
 				if (!this.userInfo || !this.userInfo.auth_address || !this.userIsOwner) return;
 
-				page.deleteZite(this.zite.id);
+				var self = this;
+				page.deleteZite(this.zite.id, () => {
+					self.$emit("update");
+				});
 			},
 			deleteZiteAdmin() {
 				if (!this.userInfo || !this.userInfo.privatekey) return;
 
-				page.deleteZite(this.getAuthAddress, this.zite.id);
+				var self = this;
+				page.deleteZiteAdmin(this.getAuthAddress, this.zite.id, () => {
+					self.$emit("update");
+				});
 			},
 			toggleBookmark: function() {
 				if (!this.userInfo) {
