@@ -250,7 +250,7 @@ class ZeroApp extends ZeroFrame {
 			page: pageNum,
 			limit: limit
 		});
-		return this.cmdp("dbQuery" [query]);
+		return this.cmdp("dbQuery", [query]);
 	}
 
 
