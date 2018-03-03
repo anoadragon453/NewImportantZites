@@ -5,7 +5,7 @@
 				<a :href="'/' + (zite.domain || zite.address)">{{ zite.title }}</a>
 			</span>
 			<div> <!-- limit text amount in some way, truncate? -->
-				{{ zite.description }}
+				<span v-if="isNSFW" style="color: red; margin-right: 5px;">NSFW </span>{{ zite.description }}
 			</div>
             <!-- Add Zite Creator -->
 			<small>
@@ -49,6 +49,9 @@
 			userIsOwner: function() {
 				if (!this.userInfo) return false;
 				return this.getAuthAddress == this.userInfo.auth_address;
+			},
+			isNSFW: function() {
+				return this.zite.tags.startsWith("nsfw,");
 			}
 		},
 		methods: {

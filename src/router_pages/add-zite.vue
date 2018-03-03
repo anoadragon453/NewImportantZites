@@ -41,6 +41,14 @@
                                 <label for="categoryselect">Category *</label>
                             </div>
 
+                            <div class="input-field col s12">
+                                <select id="languageselect"  ref="languageselect" v-model="languages" multiple required>
+                                    <option value="" disabled selected>Choose your option</option>
+                                    <option v-for="language in ziteLanguages" :value="language">{{ language }}</option>
+                                </select>
+                                <label for="categoryselect">Language(s) *</label>
+                            </div>
+
 							<div class="chips chips-placeholder" ref="tags" style="margin-bottom: 0;"></div>
 							<small>Press enter to add tag</small><br>
                             <br>
@@ -91,6 +99,7 @@
 		name: "AddZite",
 		data: () => {
 			return {
+				ziteLanguages: ziteLanguages, // Total possible languages, displayed in language selection
 				submitBtnDisabled: false,
 				title: "",
 				address: "",
@@ -100,11 +109,13 @@
 				tagsInstance: null,
 				categorySelect_instance: null,
 				mergerCategory_instance: null,
+				languageSelect_instance: null,
                 mergerSupported: false,
                 nsfw: false,
                 mergerCategory: "",
                 category: null,
 				categories: [],
+				languages: [],
 				mergerCategoryNames: [],
 				alreadyExists: false
 			}
@@ -153,6 +164,10 @@
 				var categorySelect = this.$refs.categoryselect;
 				this.categorySelect_instance = M.FormSelect.init(categorySelect, {});
 			}
+			if (!this.languageSelect_instance) {
+				var languageSelect = this.$refs.languageselect;
+				this.languageSelect_instance = M.FormSelect.init(languageSelect, {});
+			}
 
 			if (!this.mergerCategory_instance) {
 				var autocompleteData = {};
@@ -197,11 +212,12 @@
 					}
 				}
 
+				tags = tags.replace(/nsfw,/g, ""); // If nsfw already in tags, remove it so it's not duplicated if already added as tag by user
 				if (this.nsfw) {
 					tags = "nsfw," + tags;
 				}
 
-                page.addZite(this.title, this.address, this.domain, this.creator, this.description, tags, this.category, this.mergerSupported, this.mergerCategory, () => {
+                page.addZite(this.title, this.address, this.domain, this.creator, this.description, tags, this.category, this.mergerSupported, this.mergerCategory, this.languages.join(","), () => {
 					Router.navigate("");
 				});
 			},

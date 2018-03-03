@@ -41,6 +41,14 @@
                                 <label for="categoryselect">Category *</label>
                             </div>
 
+                            <div class="input-field col s12">
+                                <select id="languageselect"  ref="languageselect" v-model="languages" :value="languages" multiple required>
+                                    <option value="" disabled selected>Choose your option</option>
+                                    <option v-for="language in ziteLanguages" :value="language">{{ language }}</option>
+                                </select>
+                                <label for="categoryselect">Language(s) *</label>
+                            </div>
+
 							<div class="chips chips-placeholder" ref="tags" style="margin-bottom: 0;"></div>
 							<small>Press enter to add tag</small><br>
                             <br>
@@ -91,6 +99,7 @@
 		name: "EditZiteAdmin",
 		data: () => {
 			return {
+				ziteLanguages: ziteLanguages, // Total possible languages, displayed in language selection
 				submitBtnDisabled: false,
 				id: 0,
 				title: "",
@@ -107,6 +116,7 @@
                 mergerCategory: "",
                 category: null,
 				categories: [],
+				languages: [],
                 mergerCategoryNames: [],
                 directory: ""
 			}
@@ -145,6 +155,9 @@
 						self.mergerCategory = zite.merger_category;
 						self.mergerSupported = zite.merger_supported;
 						self.category = zite.category_slug;
+						if (zite.languages) {
+							self.languages = zite.languages.split(",");
+						}
                         self.ziteTags = zite.tags;
                         self.directory = zite.directory;
 
@@ -175,6 +188,10 @@
 						var categorySelect = self.$refs.categoryselect;
 						self.categorySelect_instance = M.FormSelect.init(categorySelect, {});
 						self.categorySelect_instance.input.value = categoryName;
+
+						var languageSelect = self.$refs.languageselect;
+						self.languageSelect_instance = M.FormSelect.init(languageSelect, {});
+						self.languageSelect_instance.input.value = self.languages;
 
 						var autocompleteData = {};
 						for (row in self.mergerCategoryNames) {
@@ -234,11 +251,12 @@
 					}
 				}
 
+				tags = tags.replace(/nsfw,/g, ""); // If nsfw already in tags, remove it in case of changes, and so it's not duplicated.
 				if (this.nsfw) {
 					tags = "nsfw," + tags;
 				}
 
-                page.editZiteAdmin(this.getAuthAddress, this.id, this.title, this.address, this.domain, this.creator, this.description, tags, this.category, this.mergerSupported, this.mergerCategory, () => {
+                page.editZiteAdmin(this.getAuthAddress, this.id, this.title, this.address, this.domain, this.creator, this.description, tags, this.category, this.mergerSupported, this.mergerCategory, this.languages.join(","), () => {
 					Router.navigate("admin");
 				});
 			},

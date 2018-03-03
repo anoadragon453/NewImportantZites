@@ -49,12 +49,13 @@
                 ["category_slug", "TEXT"],
                 ["merger_supported", "INTEGER"],
                 ["merger_category", "TEXT"],
+                ["languages", "TEXT"],
                 ["date_updated", "INTEGER"],
                 ["date_added", "INTEGER"],
                 ["json_id", "INTEGER REFERENCES json (json_id)"]
             ],
             "indexes": ["CREATE UNIQUE INDEX ZITE_key ON zites (json_id, id)", "CREATE INDEX zite_slug_idx ON zites (slug)", "CREATE INDEX zite_date_added_idx ON zites (date_added DESC)"],
-            "schema_changed": 6
+            "schema_changed": 7
         },
         "bookmarks": {
             "cols": [

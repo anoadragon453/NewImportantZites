@@ -1,4 +1,7 @@
 version = "0.1"
+ziteLanguages = [
+	"EN", "ES", "EO", "RU"
+]
 
 var anime = require("animejs");
 window.anime = anime;
@@ -313,7 +316,7 @@ class ZeroApp extends ZeroFrame {
 	}
 
 	// merger_supported :: bool
-	addZite(title, address, domain, creator, description, tags, category_slug, merger_supported, merger_category, beforePublishCB) {
+	addZite(title, address, domain, creator, description, tags, category_slug, merger_supported, merger_category, languages, beforePublishCB) {
 		if (!this.siteInfo.cert_user_id) {
     		return this.cmdp("wrapperNotification", ["error", "You must be logged in to add a zite."]);
     	}
@@ -341,6 +344,8 @@ class ZeroApp extends ZeroFrame {
 				merger_category = merger_category.replace(/(merged|merger)-/g, "");
 				creator = creator.replace(/(.)@.*$/g, "$1");
 
+				languages = languages.replace(/\s/g, "");
+
     			data["zites"].push({
     				"id": date,
 					"title": title.trim(),
@@ -353,6 +358,7 @@ class ZeroApp extends ZeroFrame {
 					"tags": tags.trim(),
 					"merger_supported": merger_supported,
 					"merger_category": merger_category.trim(),
+					"languages": languages,
     				"date_added": date
     			});
 
@@ -383,7 +389,7 @@ class ZeroApp extends ZeroFrame {
 	    	});
 	}
 
-	editZite(id, title, address, domain, creator, description, tags, category_slug, merger_supported, merger_category, beforePublishCB) {
+	editZite(id, title, address, domain, creator, description, tags, category_slug, merger_supported, merger_category, languages, beforePublishCB) {
 		if (!this.siteInfo.cert_user_id) {
     		return this.cmdp("wrapperNotification", ["error", "You must be logged in to add a zite."]);
     	}
@@ -415,6 +421,8 @@ class ZeroApp extends ZeroFrame {
 				merger_category = merger_category.replace(/(merged|merger)-/g, "");
 				creator = creator.replace(/(.)@.*$/g, "$1");
 
+				languages = languages.replace(/\s/g, "");
+
 				for (var i in data["zites"]) {
 					var zite = data["zites"][i];
 					if (zite.id == id) {
@@ -428,6 +436,7 @@ class ZeroApp extends ZeroFrame {
 						data["zites"][i].tags = tags.trim();
 						data["zites"][i].merger_supported = merger_supported;
 						data["zites"][i].merger_category = merger_category.trim();
+						data["zites"][i].languages = languages.trim();
 						data["zites"][i].date_updated = date;
 						break;
 					}
@@ -519,7 +528,7 @@ class ZeroApp extends ZeroFrame {
 	    	});
 	}
 
-	editZiteAdmin(auth_address, id, title, address, domain, creator, description, tags, category_slug, merger_supported, merger_category, beforePublishCB) {
+	editZiteAdmin(auth_address, id, title, address, domain, creator, description, tags, category_slug, merger_supported, merger_category, languages, beforePublishCB) {
 		if (!this.siteInfo.privatekey) {
     		return this.cmdp("wrapperNotification", ["error", "You must be an admin to edit this zite."]);
     	}
@@ -550,6 +559,7 @@ class ZeroApp extends ZeroFrame {
 				title = title.replace(/((https?|zero|zeronet)\:\/\/|(127\.0\.0\.1|192\.168\.0\.[0-9]+)(\:[0-9]+)?\/?|localhost|.*(\.(com|net|org|tk|uk|eu|co))+(\:[0-9]+)?\/?|zero\/)/g, "").replace(/(\?|#)\/?$/, "").replace(/\.bit/g, "").replace(/(#.*|\?.*)/g, "").replace(/\/$/g, "");
 				merger_category = merger_category.replace(/(merged|merger)-/g, "");
 				creator = creator.replace(/(.)@.*$/g, "$1");
+				languages = languages.replace(/\s/g, "");
 
 				for (var i in data["zites"]) {
 					var zite = data["zites"][i];
@@ -564,6 +574,7 @@ class ZeroApp extends ZeroFrame {
 						data["zites"][i].tags = tags.trim();
 						data["zites"][i].merger_supported = merger_supported;
 						data["zites"][i].merger_category = merger_category.trim();
+						data["zites"][i].languages = languages.trim();
 						data["zites"][i].date_updated = date;
 						break;
 					}

@@ -2,7 +2,6 @@
 	<div id="mainapp" class="container">
 		<div class="row">
 	        <div class="col s12 m12 l9">
-
 				<nav style="background-color: #4caf50; margin-bottom: .8rem; margin-top: 8px;">
 					<div class="nav-wrapper">
 						<form onsubmit="return false;">
