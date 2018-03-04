@@ -1,6 +1,6 @@
 version = "0.1"
 ziteLanguages = [
-	"EN", "ES", "EO", "RU"
+	"DA", "DE", "EN", "ES", "EO", "FR", "HU", "IT", "NL", "PL", "PT", "PT-BR", "RU", "TR", "UK", "ZH", "ZH-TW"
 ]
 
 var anime = require("animejs");
