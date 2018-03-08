@@ -7,7 +7,8 @@
             "to_table": ["categories"]
         },
         "users/.+/data.json": {
-            "to_table": ["zites", "bookmarks"]
+            "to_table": ["zites", "bookmarks"],
+			"to_keyvalue": ["languages"]
         },
         "users/.+/content.json": {
             "to_json_table": ["cert_user_id"],

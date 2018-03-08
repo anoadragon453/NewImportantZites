@@ -6,12 +6,12 @@
 				<a :href="'./?/' + link.route" v-on:click.prevent="navbarLinkClick(link)">{{ link.name }}</a>
 			</li>
 			<li class="divider"></li>
-			<li><a href="./?/admin" v-on:click.prevent="goto('admin')" v-if="userInfo && userInfo.privatekey">Admin</a></li>
-			<li class="divider"></li>
-			<!-- TODO -->
-			<!--<li><a href="#">Settings</a></li>
-			<li class="divider"></li>-->
+			<li v-if="isLoggedIn">
+				<a href="./?/settings" v-on:click.prevent="goto('settings')">Settings</a>
+			</li>
 			<li><a href="#" v-on:click.prevent="login()">Switch User</a></li>
+			<li class="divider"></li>
+			<li><a href="./?/admin" v-on:click.prevent="goto('admin')" v-if="userInfo && userInfo.privatekey">Admin</a></li>
 		</ul>
 		<nav id="navbar" class="green darken-4">
 			<div class="nav-wrapper">
@@ -42,9 +42,9 @@
 							<a :href="'./?/' + link.route" v-on:click.prevent="navbarLinkClick(link)">{{ link.name }}</a>
 						</li>
 						<li v-if="!isLoggedIn"><a v-on:click.prevent="login()">Login</a></li>
-						<li v-else><a v-on:click.prevent="">{{ userInfo ? userInfo.cert_user_id : "" }}</a></li>
-						<li v-for="category in categories">
-							<a :href="'./?/category' + category.slug">{{ category.name }}</a>
+						<li v-else><a v-on:click.prevent="login()">{{ userInfo ? userInfo.cert_user_id : "" }}</a></li>
+						<li v-if="isLoggedIn">
+							<a href="./?/settings" v-on:click.prevent="goto('settings')" v-if="isLoggedIn">Settings</a>
 						</li>
 						<li v-if="userInfo && userInfo.privatekey">
 							<a href="./?/admin" v-on:click.prevent="goto('admin')" v-if="userInfo && userInfo.privatekey">Admin</a>

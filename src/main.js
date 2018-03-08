@@ -1,7 +1,8 @@
-version = "0.1"
+
+version = "0.1";
 ziteLanguages = [
 	"DA", "DE", "EN", "ES", "EO", "FR", "HU", "IT", "NL", "PL", "PT", "PT-BR", "RU", "TR", "UK", "ZH", "ZH-TW"
-]
+];
 
 var anime = require("animejs");
 window.anime = anime;
@@ -52,17 +53,18 @@ var app = new Vue({
 
             var that = this;
 
-            that.userInfo = {
+            /*that.userInfo = {
 				privatekey: that.siteInfo.privatekey,
                 cert_user_id: that.siteInfo.cert_user_id,
                 auth_address: that.siteInfo.auth_address//,
                 //keyvalue: keyvalue
-            };
-			that.$emit("setuserinfo", that.userInfo);
-			that.$emit("update");
+            };*/
+
+			//that.$emit("setuserinfo", that.userInfo);
+			//that.$emit("update");
             if (f !== null && typeof f === "function") f();
 
-            /*page.cmd("dbQuery", ["SELECT key, value FROM keyvalue LEFT JOIN json USING (json_id) WHERE cert_user_id=\"" + this.siteInfo.cert_user_id + "\" AND directory=\"users/" + this.siteInfo.auth_address + "\""], (rows) => {
+            page.cmd("dbQuery", ["SELECT key, value FROM keyvalue LEFT JOIN json USING (json_id) WHERE cert_user_id=\"" + this.siteInfo.cert_user_id + "\" AND directory=\"users/" + this.siteInfo.auth_address + "\""], (rows) => {
                 var keyvalue = {};
 
                 for (var i = 0; i < rows.length; i++) {
@@ -70,13 +72,23 @@ var app = new Vue({
                     
                     keyvalue[row.key] = row.value;
                 }
-                if (!keyvalue.name || keyvalue.name === "") {
+                /*if (!keyvalue.name || keyvalue.name === "") {
                     return;
-				}
+				}*/
 				
+				that.userInfo = {
+					privatekey: that.siteInfo.privatekey,
+					cert_user_id: that.siteInfo.cert_user_id,
+					auth_address: that.siteInfo.auth_address,
+					keyvalue: keyvalue
+				};
+
+				console.log("Keyvalue: ", that.userInfo.keyvalue);
+
 				that.$emit("setUserInfo", that.userInfo); // TODO: Not sure if I need this if I can pass in a function callback instead
+				that.$emit("update", that.userInfo);
 				if (f !== null && typeof f === "function") f();
-            });*/
+            });
         }
 	}
 });
@@ -116,6 +128,53 @@ class ZeroApp extends ZeroFrame {
 
     unimplemented() {
         return page.cmdp("wrapperNotification", ["info", "Unimplemented!"]);
+	}
+
+	setLanguages(languages, beforePublishCB) {
+		if (!this.siteInfo.cert_user_id) {
+    		return this.cmdp("wrapperNotification", ["error", "You must be logged in to set language settings."]);
+    	}
+
+    	var data_inner_path = "data/users/" + this.siteInfo.auth_address + "/data.json";
+    	var content_inner_path = "data/users/" + this.siteInfo.auth_address + "/content.json";
+
+    	var self = this;
+    	return this.cmdp("fileGet", { "inner_path": data_inner_path, "required": false })
+    		.then((data) => {
+    			data = JSON.parse(data);
+    			if (!data) {
+    				data = {};
+				}
+				
+				data["languages"] = languages.replace(/\s/g, "");
+
+    			var json_raw = unescape(encodeURIComponent(JSON.stringify(data, undefined, '\t')));
+
+    			return self.cmdp("fileWrite", [data_inner_path, btoa(json_raw)])
+					.then((res) => {
+		    			if (res === "ok") {
+		    				return self.cmdp("siteSign", { "inner_path": content_inner_path })
+		    					.then((res) => {
+		    						if (res === "ok") {
+										app.getUserInfo();
+		    							if (beforePublishCB != null && typeof beforePublishCB === "function") beforePublishCB({ "auth_address": self.siteInfo.auth_address });
+		    							return self.cmdp("sitePublish", { "inner_path": content_inner_path, "sign": false })
+		    								.then(() => {
+		    									return { "auth_address": self.siteInfo.auth_address };
+		    								}).catch((err) => {
+                                                console.log(err);
+                                                return { "auth_address": self.siteInfo.auth_address, "err": err };
+                                            });
+		    						} else {
+		    							return self.cmdp("wrapperNotification", ["error", "Failed to sign user data."]);
+		    						}
+		    					});
+		    			} else {
+		    				return self.cmdp("wrapperNotification", ["error", "Failed to write to data file."]);
+		    			}
+		    		});
+	    	});
+
 	}
 	
 	getMergerCategoryNames() {
@@ -796,6 +855,8 @@ var EditZite = require("./router_pages/edit-zite.vue");
 var MyZites = require("./router_pages/my-zites.vue");
 var MyBookmarks = require("./router_pages/my-bookmarks.vue");
 var CategoryPage = require("./router_pages/categoryPage.vue");
+var ZiteZeroUp = require("./router_pages/zite-zeroup.vue");
+var Settings = require("./router_pages/settings.vue");
 var Admin = require("./router_pages/admin.vue");
 var EditZiteAdmin = require("./router_pages/edit-zite-admin.vue");
 
@@ -803,6 +864,8 @@ VueZeroFrameRouter.VueZeroFrameRouter_Init(Router, app, [
 	{ route: "admin/edit/:authaddress/:ziteid", component: EditZiteAdmin },
 	{ route: "admin", component: Admin },
 	{ route: "about", component: About },
+	{ route: "settings", component: Settings },
+	{ route: "zite/zeroup", component: ZiteZeroUp },
 	{ route: "my-bookmarks", component: MyBookmarks },
 	{ route: "my-zites", component: MyZites },
 	{ route: "edit-zite/:ziteid", component: EditZite },
