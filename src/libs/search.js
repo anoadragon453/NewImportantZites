@@ -1,5 +1,5 @@
 function matchExpressions(searchWords, table, id_col) {
-    return (row) => {
+    return (row, usingJson = false) => {
         var expressions = "";
         for (var i = 0; i < searchWords.length; i++) {
             var word = searchWords[i].replace(/'/g, "''").replace(/%/g, "[%]");
@@ -9,7 +9,11 @@ function matchExpressions(searchWords, table, id_col) {
                 word = word.slice(1);
                 console.log(word);
             }
-            expressions += "(SELECT COUNT(" + row + ") FROM " + table + " AS " + row + "match" + i + " WHERE " + row + (negate ? " NOT" : "") + " LIKE '%" + word + "%' AND " + table + "." + row + "=" + row + "match" + i + "." + row + " AND " + table + "." + id_col + "=" + row + "match" + i + "." + id_col + " AND " + table + ".json_id=" + row + "match" + i + ".json_id) AS " + row + "match" + i;
+            var joinJson = "";
+            if (usingJson) {
+                joinJson = " LEFT JOIN json AS json_" + row + "match" + i + " USING (json_id) "
+            }
+            expressions += "(SELECT COUNT(" + row + ") FROM " + table + " AS " + row + "match" + i + joinJson + " WHERE " + (usingJson ? "json_" + row + "match" + i + "." + row : row) + (negate ? " NOT" : "") + " LIKE '%" + word + "%' AND " + (usingJson ? "json" : table) + "." + row + "=" + (usingJson ? "json_" : "") + row + "match" + i + "." + row + " AND " + table + "." + id_col + "=" + row + "match" + i + "." + id_col + " AND " + table + ".json_id=" + row + "match" + i + ".json_id) AS " + row + "match" + i;
             if (i != searchWords.length - 1) {
                 expressions += ", ";
             }
@@ -63,6 +67,7 @@ function searchDbQuery(zeroframe, searchQuery, options) {
         var inSearchMatchesAdded = options.searchSelects[i].inSearchMatchesAdded != undefined ? options.searchSelects[i].inSearchMatchesAdded : true;
         var inSearchMatchesOrderBy = options.searchSelects[i].inSearchMatchesOrderBy != undefined ? options.searchSelects[i].inSearchMatchesOrderBy : true;
         var skip = options.searchSelects[i].skip != undefined ? options.searchSelects[i].skip : false;
+        var usingJson = options.searchSelects[i].usingJson != undefined ? options.searchSelects[i].usingJson : false;
 
         if (!skip) {
             if (i != 0) {
@@ -71,7 +76,7 @@ function searchDbQuery(zeroframe, searchQuery, options) {
             if (select) {
                 searchSelects += "(" + select + ") AS " + col;
             } else {
-                searchSelects += matchExpressions_inner(col);
+                searchSelects += matchExpressions_inner(col, usingJson);
             }
         }
 

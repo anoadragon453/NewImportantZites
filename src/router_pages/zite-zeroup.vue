@@ -142,6 +142,7 @@
                     searchSelects: [
                         { col: "title", score: 5 },
                         { col: "file_name", score: 4 },
+                        { col: "cert_user_id", score: 3, usingJson: true },
                         //{ col: "directory", score: 2 },
                         { col: "date_added", score: 1 }
                     ],
