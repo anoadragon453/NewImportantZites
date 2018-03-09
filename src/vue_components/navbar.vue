@@ -49,6 +49,13 @@
 						<li v-if="userInfo && userInfo.privatekey">
 							<a href="./?/admin" v-on:click.prevent="goto('admin')" v-if="userInfo && userInfo.privatekey">Admin</a>
 						</li>
+						<li class="divider">
+							<li><a class="collection-item" :class="{ 'active': false }" :href="'./?/zite/zeroup'" v-on:click.prevent="goto('zite/zeroup');">ZeroUp</a></li>
+							<li><a class="collection-item" :class="{ 'active': false }" :href="'./?/zite/zerosites'" v-on:click.prevent="goto('zite/zerosites');">ZeroSites</a></li>
+							<li><a class="collection-item" :class="{ 'active': false }" :href="'./?/zite/zerolist'" v-on:click.prevent="goto('zite/zerolist');">0List</a></li>
+							<li><a class="collection-item" :class="{ 'active': false }" :href="'./?/zite/zerotalk'" v-on:click.prevent="goto('zite/zerotalk');">ZeroTalk</a></li>
+							<li><a class="collection-item" :class="{ 'active': false }" :href="'./?/zite/kiwipedia'" v-on:click.prevent="goto('zite/kiwipedia');">Kiwipedia</a></li>
+						</li>
 					</ul>
 				</div>
 			</div>
