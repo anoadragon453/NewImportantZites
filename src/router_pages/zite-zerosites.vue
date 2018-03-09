@@ -93,6 +93,7 @@
             },
             getCorsAndDb: function() {
                 var self = this;
+                this.pageNum = 0;
                 if(page.siteInfo.settings.permissions.indexOf("Cors:" + self.address) < 0) {
                     page.cmd("corsPermission", self.address, function() {
                         self.getResults();
@@ -142,14 +143,21 @@
                     this.pageNum = 0;
                     return;
                 }
+                this.results = [];
+                this.loading = true;
 				this.getResults();
 			},
 			nextPage: function() {
 				this.pageNum += 1;
+                this.results = [];
+                this.loading = true;
 				this.getResults();
             },
 			clearSearch: function() {
 				this.searchQuery = "";
+                this.results = [];
+                this.loading = true;
+                this.pageNum = 0;
 				this.getResults();
 			},
 			searchEnter: function(e) {

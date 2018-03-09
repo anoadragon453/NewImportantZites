@@ -52,8 +52,6 @@
 
 <script>
 	var Router = require("../libs/router.js");
-	//var categoriesSidebar = require("../vue_components/categories.vue");
-    var ziteListItem = require("../vue_components/zite_list_item.vue");
     var searchDbQuery = require("../libs/search.js");
 
 	module.exports = {
@@ -94,6 +92,7 @@
             },
             getCorsAndDb: function() {
                 var self = this;
+                this.pageNum = 0;
                 if(page.siteInfo.settings.permissions.indexOf("Cors:" + self.address) < 0) {
                     page.cmd("corsPermission", self.address, function() {
                             self.getResults();
@@ -156,11 +155,13 @@
 				this.searchQuery = "";
                 this.results = [];
                 this.loading = true;
+                this.pageNum = 0;
 				this.getResults();
 			},
 			searchEnter: function(e) {
                 this.results = [];
                 this.loading = true;
+                this.pageNum = 0;
                 this.getResults();
 			}
 		}

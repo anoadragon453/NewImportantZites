@@ -3,7 +3,6 @@ version = "0.1";
 ziteLanguages = [
 	"DA", "DE", "EN", "ES", "EO", "FR", "HU", "IT", "NL", "PL", "PT", "PT-BR", "RU", "TR", "UK", "ZH", "ZH-TW"
 ];
-db = null;
 
 var anime = require("animejs");
 window.anime = anime;

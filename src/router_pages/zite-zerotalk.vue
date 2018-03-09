@@ -1,20 +1,31 @@
 <template>
 	<div id="ZiteZeroTalk" class="container">
 		<div class="row">
-	        <div class="col s12 m12 l8 push-l2">
+	        <div class="col s12 m12 l9">
 				<nav style="background-color: #4caf50; margin-bottom: .8rem; margin-top: 8px;">
 					<div class="nav-wrapper">
 					<form onsubmit="return false;">
-						<div class="input-field">
-						<input id="search" type="search" placeholder="Search ZeroTalk" v-on:input.prevent="getResults" v-on:keyup.enter="searchEnter($event)" v-model="searchQuery" required>
-						<label class="label-icon" for="search"><i class="material-icons">search</i></label>
-						<i class="material-icons" v-on:click.prevent="clearSearch()">close</i>
-						</div>
+                        <div class="row" style="padding: 0; margin: 0; height: 100%;">
+                            <div class="input-field col s10 m11 l12" style="display: inline-block; margin: 0; padding: 0;">
+                                <input id="search" type="search" placeholder="Search ZeroTalk" v-on:input.prevent="getResults" v-on:keyup.enter="searchEnter($event)" v-model="searchQuery" required style="margin: 0;">
+                                <label class="label-icon" for="search" style="padding-left: 10px;"><i class="material-icons">search</i></label>
+                                <i class="material-icons" style="padding-right: 10px;" v-on:click.prevent="clearSearch()">close</i>
+                            </div>
+                            <div class="col s2 m1 hide-on-large-only">
+                                <a class="dropdown-trigger" href="#" data-target='searchDropdown' ref="searchDropdownTrigger" style="margin: auto; text-align: center;">
+                                    <i class="material-icons">keyboard_arrow_down</i>
+                                </a>
+                            </div>
+                        </div>
 					</form>
 					</div>
 				</nav>
 
-                <div class="preloader-wrapper small active" v-if="loading" style="position: fixed; left: 48%; top: 48%;">
+				<ul id='searchDropdown' class='dropdown-content' ref="searchDropdown">
+                    <li v-for="clone in clones" :key="clone.address" :class="{ 'active': address == clone.address }" v-on:click.prevent="switchClone(clone)"><a href="#">{{ clone.name }}</a></li>
+				</ul>
+
+                <div class="preloader-wrapper small active" v-if="loading">
                     <div class="spinner-layer spinner-green-only">
                     <div class="circle-clipper left">
                         <div class="circle"></div>
@@ -46,7 +57,12 @@
 				</ul>
 	        </div>
 	        <div class="col s12 m12 l3">
-	        	<component :is="categoriesSidebar" :categories="categories"></component>
+                <component :is="zite_search_sidebar">
+                    <div class="center-align side-header">ZeroTalk Clones</div>
+                    <ul class="collection">
+                        <a class="collection-item center-align" href="#" v-for="clone in clones" :class="{ 'active': address == clone.address }" v-on:click.prevent="switchClone(clone)" :key="clone.address">{{ clone.name }}</a>
+                    </ul>
+                </component>
 	        </div>
 	    </div>
 	</div>
@@ -54,8 +70,7 @@
 
 <script>
 	var Router = require("../libs/router.js");
-	//var categoriesSidebar = require("../vue_components/categories.vue");
-    var ziteListItem = require("../vue_components/zite_list_item.vue");
+    var ziteSearchSidebar = require("../vue_components/zite_search_sidebar.vue");
     var searchDbQuery = require("../libs/search.js");
 
 	module.exports = {
@@ -63,11 +78,16 @@
 		name: "ZiteZeroTalk",
 		data: () => {
 			return {
+                zite_search_sidebar: ziteSearchSidebar,
                 loading: true,
                 results: [],
                 searchQuery: "",
 				pageNum: 0,
                 searchQuery: "",
+                clones: [
+                    { name: "ZeroTalk", address: "1TaLkFrMwvbNsooF4ioKAY9EuxTBTjipT" },
+                    { name: "ZeroDevTalk", address: "142jqssVAj2iRxMACJg2dzipB5oicZYz5w" }
+                ],
                 address: "1TaLkFrMwvbNsooF4ioKAY9EuxTBTjipT",
                 dbfile: "zerotalk.db"
 			}
@@ -85,6 +105,14 @@
 
 			this.$parent.$on("update", function() {
                 self.getCorsAndDb();
+			});
+		},
+		mounted: function() {
+			var searchDropdown = this.$refs.searchDropdownTrigger;
+			var searchDropdown_instance = M.Dropdown.init(searchDropdown, {
+				alignment: "right",
+				constrainWidth: false,
+				coverTrigger: false
 			});
 		},
 		methods: {
@@ -109,6 +137,7 @@
             },
             getCorsAndDb: function() {
                 var self = this;
+                this.pageNum = 0;
                 if(page.siteInfo.settings.permissions.indexOf("Cors:" + self.address) < 0) {
                     page.cmd("corsPermission", self.address, function() {
                         self.getResults();
@@ -154,19 +183,34 @@
                     this.pageNum = 0;
                     return;
                 }
+                this.results = [];
+                this.loading = true;
 				this.getResults();
 			},
 			nextPage: function() {
 				this.pageNum += 1;
+                this.results = [];
+                this.loading = true;
 				this.getResults();
             },
 			clearSearch: function() {
-				this.searchQuery = "";
+                this.searchQuery = "";
+                this.results = [];
+                this.loading = true;
+                this.pageNum = 0;
 				this.getResults();
 			},
 			searchEnter: function(e) {
 				page.cmd("wrapperOpenWindow", ["/" + this.zites[0].address]);
-			}
+            },
+            switchClone: function(clone) {
+                this.loading = true;
+                this.results = [];
+                this.address = clone.address;
+                this.dbfile = "zerotalk.db";
+                if (clone.dbfile) this.dbfile = clone.dbfile;
+                this.getCorsAndDb();
+            }
 		}
 	}
 </script>
