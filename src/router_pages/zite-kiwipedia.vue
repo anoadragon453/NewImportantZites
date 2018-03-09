@@ -154,6 +154,10 @@
                 });
 
                 page.cmd("as", [self.address, "dbQuery", [query]], function(results) {
+                    if (results.length == 0 && self.pageNum != 0) {
+                        self.pageNum--;
+                        return;
+                    }
                     self.results = results;
                     //console.log(results);
                     self.loading = false;
