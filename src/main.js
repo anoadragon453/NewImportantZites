@@ -274,7 +274,7 @@ class ZeroApp extends ZeroFrame {
 	// TODO: Username/id at multiplication of 1
 	getZitesSearch(searchQuery, pageNum = 0, limit = 8) {
 		var languageWhere = "";
-		if (app.userInfo && app.userInfo.keyvalue && app.userInfo.keyvalue.languages) {
+		if (app.userInfo && app.userInfo.keyvalue && app.userInfo.keyvalue.languages && app.userInfo.keyvalue.language != "") {
 			languageWhere += "(";
 			var languages = app.userInfo.keyvalue.languages.split(",");
 			for (var i = 0; i < languages.length; i++) {
@@ -311,7 +311,7 @@ class ZeroApp extends ZeroFrame {
 
 	getZitesInCategorySearch(categorySlug, searchQuery, pageNum = 0, limit = 8) {
 		var languageWhere = "";
-		if (app.userInfo && app.userInfo.keyvalue && app.userInfo.keyvalue.languages) {
+		if (app.userInfo && app.userInfo.keyvalue && app.userInfo.keyvalue.languages && app.userInfo.keyvalue.language != "") {
 			languageWhere += " AND (";
 			var languages = app.userInfo.keyvalue.languages.split(",");
 			for (var i = 0; i < languages.length; i++) {
