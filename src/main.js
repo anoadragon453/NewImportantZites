@@ -34,13 +34,14 @@ var app = new Vue({
 	el: "#app",
 	template: `<div>
 			<component ref="navbar" :is="navbar" :user-info="userInfo"></component>
-			<component ref="view" :is="currentView" v-on:get-user-info="getUserInfo()" :user-info="userInfo"></component>
+			<component ref="view" :is="currentView" v-on:get-user-info="getUserInfo()" :user-info="userInfo" :zite-to-import="ziteToImport" v-on:import-zite="importZite"></component>
 		</div>`,
 	data: {
 		navbar: Navbar,
 		currentView: null,
 		siteInfo: null,
-		userInfo: null
+		userInfo: null,
+		ziteToImport: null
 	},
 	methods: {
 		getUserInfo: function(f = null) {
@@ -90,7 +91,11 @@ var app = new Vue({
 				that.$emit("update", that.userInfo);
 				if (f !== null && typeof f === "function") f();
             });
-        }
+		},
+		importZite: function(zite) {
+			this.ziteToImport = zite;
+			Router.navigate('import-zite');
+		}
 	}
 });
 
@@ -853,6 +858,7 @@ var Home = require("./router_pages/home.vue");
 var About = require("./router_pages/about.vue");
 var AddZite = require("./router_pages/add-zite.vue");
 var EditZite = require("./router_pages/edit-zite.vue");
+var ImportZite = require("./router_pages/import-zite.vue");
 var MyZites = require("./router_pages/my-zites.vue");
 var MyBookmarks = require("./router_pages/my-bookmarks.vue");
 var CategoryPage = require("./router_pages/categoryPage.vue");
@@ -877,6 +883,7 @@ VueZeroFrameRouter.VueZeroFrameRouter_Init(Router, app, [
 	{ route: "zite/kiwipedia", component: ZiteKiwipedia },
 	{ route: "my-bookmarks", component: MyBookmarks },
 	{ route: "my-zites", component: MyZites },
+	{ route: "import-zite", component: ImportZite },
 	{ route: "edit-zite/:ziteid", component: EditZite },
 	{ route: "add-zite", component: AddZite },
 	{ route: "category/:categoryslug", component: CategoryPage },
