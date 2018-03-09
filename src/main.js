@@ -55,15 +55,6 @@ var app = new Vue({
 
             var that = this;
 
-            /*that.userInfo = {
-				privatekey: that.siteInfo.privatekey,
-                cert_user_id: that.siteInfo.cert_user_id,
-                auth_address: that.siteInfo.auth_address//,
-                //keyvalue: keyvalue
-            };*/
-
-			//that.$emit("setuserinfo", that.userInfo);
-			//that.$emit("update");
             if (f !== null && typeof f === "function") f();
 
             page.cmd("dbQuery", ["SELECT key, value FROM keyvalue LEFT JOIN json USING (json_id) WHERE cert_user_id=\"" + this.siteInfo.cert_user_id + "\" AND directory=\"users/" + this.siteInfo.auth_address + "\""], (rows) => {
@@ -74,9 +65,6 @@ var app = new Vue({
                     
                     keyvalue[row.key] = row.value;
                 }
-                /*if (!keyvalue.name || keyvalue.name === "") {
-                    return;
-				}*/
 				
 				that.userInfo = {
 					privatekey: that.siteInfo.privatekey,

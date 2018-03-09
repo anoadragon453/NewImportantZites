@@ -14,12 +14,6 @@
 					</div>
 				</nav>
 
-				<!--<ul class="pagination center-align" v-if="zites.length >= 4">
-					<li><a href="#!" v-on:click.prevent="previousPage"><i class="material-icons">chevron_left</i></a></li>
-					<li class="disabled"><a href="#!">{{ pageNum + 1 }}</a></li>
-					<li><a href="#!" v-on:click.prevent="nextPage"><i class="material-icons">chevron_right</i></a></li>
-				</ul>-->
-
                 <div class="preloader-wrapper small active" v-if="loading" style="position: fixed; left: 48%; top: 48%;">
                     <div class="spinner-layer spinner-green-only">
                     <div class="circle-clipper left">
@@ -43,7 +37,6 @@
                     </div>
                 </div>
 
-				<!-- TODO: Use getSearchResults when check for length once search has been implemented -->
 				<ul class="pagination center-align" v-if="results.length != 0">
 					<li><a href="#!" v-on:click.prevent="previousPage"><i class="material-icons">chevron_left</i></a></li>
 					<li class="disabled"><a href="#!">{{ pageNum + 1 }}</a></li>
@@ -61,8 +54,6 @@
 	var Router = require("../libs/router.js");
 	//var categoriesSidebar = require("../vue_components/categories.vue");
     var ziteListItem = require("../vue_components/zite_list_item.vue");
-    var SQL = require('sql.js');
-    var Base64Binary = require("../libs/base64-binary");
     var searchDbQuery = require("../libs/search.js");
 
 	module.exports = {
@@ -91,7 +82,6 @@
             
 
 			this.$parent.$on("update", function() {
-                //self.getQuestions();
                 self.getCorsAndDb();
 			});
 		},
@@ -106,27 +96,10 @@
                 var self = this;
                 if(page.siteInfo.settings.permissions.indexOf("Cors:" + self.address) < 0) {
                     page.cmd("corsPermission", self.address, function() {
-                        page.cmd("fileGet",
-                        {
-                            "inner_path": 'cors-' + self.address + '/' + self.dbfile,
-                            "format": 'base64'
-                            }, function(data) {
-                                //var uIntuArray = new Uint8Array(Base64Binary.decodeArrayBuffer(data));
-                                //db = new SQL.Database(uInt8Array);
-                                //fetchfromdb(searchterm)
-                                self.getResults();
-                            });
-                        });
-                } else {
-                    page.cmd("fileGet", {
-                            "inner_path": 'cors-' + self.address + '/' + self.dbfile,
-                            "format": 'base64'
-                        }, function(data) {
-                            //var uInt8Array = new Uint8Array(Base64Binary.decodeArrayBuffer(data));
-                            //db = new SQL.Database(uInt8Array);
-                            //fetchfromdb(searchterm)
                             self.getResults();
                         });
+                } else {
+                    self.getResults();
                 }
             },
             getResults: function() {
@@ -162,25 +135,6 @@
                     //console.log(results);
                     self.loading = false;
                 });
-
-                //var files = db.exec(query);
-
-                /*if (files.length == 0 && self.pageNum != 0) {
-                    self.pageNum--;
-                    //self.getResults();
-                    return;
-                }*/
-
-                //console.log(files);
-
-                /*self.results = [];
-                for (var i = 0; i < files[0].values.length; i++) {
-                    var result = {};
-                    for (var j = 0; j < files[0].columns.length; j++) {
-                        result[files[0].columns[j]] = files[0].values[i][j];
-                    }
-                    self.results.push(result);
-                }*/
             },
 			previousPage: function() { // TODO: Scroll to top
 				this.pageNum -= 1;

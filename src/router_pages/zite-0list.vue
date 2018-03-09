@@ -14,14 +14,6 @@
 					</div>
 				</nav>
 
-				<!--<ul class="pagination center-align" v-if="zites.length >= 4">
-					<li><a href="#!" v-on:click.prevent="previousPage"><i class="material-icons">chevron_left</i></a></li>
-					<li class="disabled"><a href="#!">{{ pageNum + 1 }}</a></li>
-					<li><a href="#!" v-on:click.prevent="nextPage"><i class="material-icons">chevron_right</i></a></li>
-				</ul>-->
-
-				<!--<component :is="zite_list_item" :user-info="userInfo" v-for="zite in zites" :zite="zite" :show-category="true" :categories="categories" v-on:update="getZites()"></component>-->
-
                 <div class="preloader-wrapper small active" v-if="loading" style="position: fixed; left: 48%; top: 48%;">
                     <div class="spinner-layer spinner-green-only">
                     <div class="circle-clipper left">
@@ -63,8 +55,6 @@
 	var Router = require("../libs/router.js");
 	//var categoriesSidebar = require("../vue_components/categories.vue");
     var ziteListItem = require("../vue_components/zite_list_item.vue");
-    var SQL = require('sql.js');
-    var Base64Binary = require("../libs/base64-binary");
     var searchDbQuery = require("../libs/search.js");
 
 	module.exports = {
@@ -118,21 +108,10 @@
                 var self = this;
                 if(page.siteInfo.settings.permissions.indexOf("Cors:" + self.address) < 0) {
                     page.cmd("corsPermission", self.address, function() {
-                        page.cmd("fileGet",
-                        {
-                            "inner_path": 'cors-' + self.address + '/data/users/' + self.dbfile,
-                            "format": 'base64'
-                            }, function(data) {
-                                self.getResults();
-                            });
-                        });
-                } else {
-                    page.cmd("fileGet", {
-                            "inner_path": 'cors-' + self.address + '/data/users/' + self.dbfile,
-                            "format": 'base64'
-                        }, function(data) {
                             self.getResults();
                         });
+                } else {
+                    self.getResults();
                 }
             },
             getResults: function() {
@@ -162,25 +141,9 @@
                         return;
                     }
                     self.results = results;
-                    console.log(results);
+                    //console.log(results);
                     self.loading = false;
                 });
-
-                /*self.results = [];
-                for (var i = 0; i < files[0].values.length; i++) {
-                    var result = {};
-                    for (var j = 0; j < files[0].columns.length; j++) {
-                        result[files[0].columns[j]] = files[0].values[i][j];
-                        if (files[0].columns[j] == "body") {
-                            var matches = files[0].values[i][j].match(/https?\:\/\/127\.0\.0\.1\:43110\/[A-Za-z0-9\.]+/);
-                            //console.log(matches);
-                            if (matches) {
-                                result["address"] = matches[0].replace(/https?\:\/\//g, "").replace(/127\.0\.0\.1/g, "").replace(/\:43110\/?/g, "").replace(/\//g, "");
-                            }
-                        }
-                    }
-                    self.results.push(result);
-                }*/
             },
 			previousPage: function() { // TODO: Scroll to top
 				this.pageNum -= 1;
