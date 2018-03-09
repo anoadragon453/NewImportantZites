@@ -274,6 +274,8 @@
 						if (zites[0]) {
 							self.alreadyExists = true;
 							page.cmd("wrapperNotification", ["error", "This zite was already added.<br>\nContact zite owner at krixano@zeroid.bit<br>\non ZeroMail if you own the zite and want<br>\nto transfer it to your profile."]);
+						} else {
+							self.alreadyExists = false;
 						}
 					})
 			},
