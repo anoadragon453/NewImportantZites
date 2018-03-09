@@ -12,7 +12,7 @@
                 <!--Published {{ getDate }} <span>by <a href="#">{{ getName }}</a><span v-if="showCategory"> in <a href="#">{{ getCategoryName }}</a></span></span><br>-->
                 Created by <a href="#">{{ zite.creator }}</a><span v-if="zite.creator.toLowerCase().replace(/@.*/g, '').replace(/\s/g, '') != getName.toLowerCase()">, Submitted by <a href="#">{{ getName }}</a></span>
 				<em v-if="userIsOwner"> | <a :href="'edit-zie/' + zite.id" v-on:click.prevent="goto('edit-zite/' + zite.id)">Edit</a> | <a href="#" v-on:click.prevent="deleteZite()">Delete</a></em>
-				<em v-if="zite.merger_category"> | <a href="#" v-on:click.prevent="toggleMergerZites()">Show Merger Zites</a></em>
+				<em v-if="zite.merger_category && zite.merger_supported"> | <a href="#" v-on:click.prevent="toggleMergerZites()">Show Merger Zites</a></em>
 				<em v-if="userInfo"> | <a href="#" v-on:click.prevent="toggleBookmark()">{{ zite.bookmarkCount >= 1 ? "Unbookmark" : "Bookmark" }}</a>
 				<span v-if="userInfo && userInfo.privatekey" style="float: right;"><a :href="'./?/admin/edit/' + getAuthAddress + '/' + zite.id" v-on:click.prevent="goto('admin/edit/' + getAuthAddress + '/' + zite.id)">Admin Edit</a> | <a href="#" v-on:click.prevent="deleteZiteAdmin()">Admin Delete</a></span></em>
             </small>
@@ -111,7 +111,7 @@
 				}
 			},
 			toggleMergerZites: function() {
-				if (!this.zite.merger_category) return;
+				if (!this.zite.merger_category || !this.zite.merger_supported) return;
 				if (!this.showMergerZites) {
 					// Get Merger Zites to list
 					var query = `
