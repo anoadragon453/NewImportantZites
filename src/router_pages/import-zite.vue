@@ -142,15 +142,21 @@
                         self.titleChanged();
                         self.address = self.ziteToImport.address;
                         self.addressChanged();
-                        self.creator = self.ziteToImport.cert_user_id;
-                        self.creatorChanged();
-						self.description = self.ziteToImport.description;
+                        if (self.ziteToImport.cert_user_id) {
+                            self.creator = self.ziteToImport.cert_user_id;
+                            self.creatorChanged();
+                        }
+						self.description = self.ziteToImport.description || "";
 						/*if (zite.languages) {
 							self.languages = zite.languages.split(",");
                         }*/
-                        self.languages = [self.ziteToImport.language.toUpperCase()]; // TODO
-                        if (self.languages == "MULTI") {
-                            self.languages = self.ziteLanguages;
+                        if (self.ziteToImport.language) {
+                            self.languages = [self.ziteToImport.language.toUpperCase()]; // TODO
+                            if (self.languages == "MULTI") {
+                                self.languages = self.ziteLanguages;
+                            }
+                        } else {
+                            self.languages = [];
                         }
 						//self.ziteTags = ziteToImport.tags.split(",");
 
@@ -260,7 +266,7 @@
 
             },
 			addressChanged: function() {
-                this.address = this.address.replace(/((https?|zero|zeronet)\:\/\/|(127\.0\.0\.1|192\.168\.0\.[0-9]+)(\:[0-9]+)?\/?|localhost|.*(\.(com|net|org|tk|uk|eu|co|bit))+(\:[0-9]+)?\/?|zero\/)/g, "").replace(/(\?|#)\/?$/, "").replace(/\/$/g, "").replace(/\/$/, "");
+                this.address = this.address.replace(/((https?|zero|zeronet)\:\/\/|(127\.0\.0\.1|192\.168\.0\.[0-9]+)(\:[0-9]+)?\/?|localhost|.*(\.(com|net|org|tk|uk|eu|co|bit))+(\:[0-9]+)?\/?|zero\/)/g, "").replace(/(\?|#)\/?$/, "").replace(/\/$/g, "").replace(/\/$/, "").replace(/^\//, "");
 
 				var self = this;
 				page.getZiteByAddress(this.address)

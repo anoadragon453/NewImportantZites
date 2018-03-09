@@ -40,7 +40,7 @@
                             <a :href="getAddress(result)">{{ result.title }}</a>
                         </span>
                         <small>
-                            Published by {{ result.directory.replace(/users\//, "").replace(/\//g, "") }} <em>| <a :href="getTopicUrl(result)">Goto 0List Topic</a></em>
+                            Published by {{ result.directory.replace(/users\//, "").replace(/\//g, "") }} <em>| <a :href="getTopicUrl(result)">Goto 0List Topic</a> | <a href="#" v-on:click.prevent="importZite(result)">Import Into Important Zites</a></em>
                         </small>
                     </div>
                 </div>
@@ -196,7 +196,13 @@
 			},
 			searchEnter: function(e) {
 				page.cmd("wrapperOpenWindow", ["/" + this.zites[0].address]);
-			}
+            },
+            importZite: function(result) {
+                this.$emit('import-zite', {
+                    "title": result.title,
+                    "address": this.getAddress(result)
+                });
+            }
 		}
 	}
 </script>
