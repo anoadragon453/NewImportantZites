@@ -7,6 +7,7 @@
 				<div class="center-align side-header">Search Other Zites</div>
 
 				<ul class="collection">
+					<a class="collection-item center-align" :class="{ 'active': false }" :href="'./?/'" v-on:click.prevent="goto('');">Important Zites</a>
 					<a class="collection-item center-align" :class="{ 'active': false }" :href="'./?/zite/zeroup'" v-on:click.prevent="goto('zite/zeroup');">ZeroUp</a>
 					<a class="collection-item center-align" :class="{ 'active': false }" :href="'./?/zite/zerosites'" v-on:click.prevent="goto('zite/zerosites');">ZeroSites</a>
 					<a class="collection-item center-align" :class="{ 'active': false }" :href="'./?/zite/zerolist'" v-on:click.prevent="goto('zite/zerolist');">0List</a>
