@@ -192,7 +192,10 @@
 						
 						var mergerCategory = self.$refs.mergercategory;
 						self.mergerCategory_instance = M.Autocomplete.init(mergerCategory, {
-							data: autocompleteData
+							data: autocompleteData,
+							onAutocomplete: (text) => {
+								self.mergerCategory = text;
+							}
 						});
 						self.$forceUpdate();
 					});
