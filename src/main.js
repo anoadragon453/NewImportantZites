@@ -273,6 +273,18 @@ class ZeroApp extends ZeroFrame {
 
 	// TODO: Username/id at multiplication of 1
 	getZitesSearch(searchQuery, pageNum = 0, limit = 8) {
+		var languageWhere = "";
+		if (app.userInfo && app.userInfo.keyvalue && app.userInfo.keyvalue.languages) {
+			languageWhere += "(";
+			var languages = app.userInfo.keyvalue.languages.split(",");
+			for (var i = 0; i < languages.length; i++) {
+				var language = languages[i];
+				if (i != 0) languageWhere += " OR ";
+				languageWhere += "languages LIKE '" + language + "' OR languages LIKE '%," + language + "' OR languages LIKE '" + language + ",%' OR languages LIKE '%," + language + ",%'";
+			}
+			languageWhere += " OR languages='' OR languages IS NULL";
+			languageWhere += ")";
+		}
 		var query = searchDbQuery(this, searchQuery, {
 			orderByScore: true,
 			id_col: "id",
@@ -290,6 +302,7 @@ class ZeroApp extends ZeroFrame {
 			],
 			table: "zites",
 			join: "LEFT JOIN json USING (json_id)",
+			where: languageWhere,
 			page: pageNum,
 			limit: limit
 		});
@@ -297,6 +310,18 @@ class ZeroApp extends ZeroFrame {
 	}
 
 	getZitesInCategorySearch(categorySlug, searchQuery, pageNum = 0, limit = 8) {
+		var languageWhere = "";
+		if (app.userInfo && app.userInfo.keyvalue && app.userInfo.keyvalue.languages) {
+			languageWhere += " AND (";
+			var languages = app.userInfo.keyvalue.languages.split(",");
+			for (var i = 0; i < languages.length; i++) {
+				var language = languages[i];
+				if (i != 0) languageWhere += " OR ";
+				languageWhere += "languages LIKE '" + language + "' OR languages LIKE '%," + language + "' OR languages LIKE '" + language + ",%' OR languages LIKE '%," + language + ",%'";
+			}
+			languageWhere += " OR languages='' OR languages IS NULL";
+			languageWhere += ")";
+		}
 		var query = searchDbQuery(this, searchQuery, {
 			orderByScore: true,
 			id_col: "id",
@@ -313,7 +338,7 @@ class ZeroApp extends ZeroFrame {
 				{ skip: !app.userInfo || !app.userInfo.auth_address, col: "bookmarkCount", select: this.subQueryBookmarks(), inSearchMatchesAdded: false, inSearchMatchesOrderBy: true, score: 6 } // TODO: Rename inSearchMatchesAdded, and isSearchMatchesOrderBy
 			],
 			table: "zites",
-			where: "category_slug='" + categorySlug + "'",
+			where: "category_slug='" + categorySlug + "'" + languageWhere,
 			join: "LEFT JOIN json USING (json_id)",
 			page: pageNum,
 			limit: limit
