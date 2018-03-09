@@ -11,6 +11,10 @@
 				<div class="center-align side-header">Search Other Zites</div>
 				<ul class="collection">
 					<a class="collection-item center-align" :class="{ 'active': false }" :href="'./?/zite/zeroup'" v-on:click.prevent="goto('zite/zeroup');">ZeroUp</a>
+					<a class="collection-item center-align" :class="{ 'active': false }" :href="'./?/zite/zerosites'" v-on:click.prevent="goto('zite/zerosites');">ZeroSites</a>
+					<a class="collection-item center-align" :class="{ 'active': false }" :href="'./?/zite/zerolist'" v-on:click.prevent="goto('zite/zerolist');">0List</a>
+					<a class="collection-item center-align" :class="{ 'active': false }" :href="'./?/zite/zerotalk'" v-on:click.prevent="goto('zite/zerotalk');">ZeroTalk</a>
+					<a class="collection-item center-align" :class="{ 'active': false }" :href="'./?/zite/kiwipedia'" v-on:click.prevent="goto('zite/kiwipedia');">Kiwipedia</a>
 				</ul>
 	        	<div class="center-align">
 	        		<a href="/Mail.ZeroNetwork.bit/?to=krixano">Request New Category or Claim Ownership of zite: krixano@zeroid.bit</a> <!-- TODO -->

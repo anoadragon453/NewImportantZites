@@ -3,6 +3,7 @@ version = "0.1";
 ziteLanguages = [
 	"DA", "DE", "EN", "ES", "EO", "FR", "HU", "IT", "NL", "PL", "PT", "PT-BR", "RU", "TR", "UK", "ZH", "ZH-TW"
 ];
+db = null;
 
 var anime = require("animejs");
 window.anime = anime;
@@ -856,6 +857,10 @@ var MyZites = require("./router_pages/my-zites.vue");
 var MyBookmarks = require("./router_pages/my-bookmarks.vue");
 var CategoryPage = require("./router_pages/categoryPage.vue");
 var ZiteZeroUp = require("./router_pages/zite-zeroup.vue");
+var ZiteZeroSites = require("./router_pages/zite-zerosites.vue");
+var ZiteZeroList = require("./router_pages/zite-0list.vue");
+var ZiteZeroTalk = require("./router_pages/zite-zerotalk.vue");
+var ZiteKiwipedia = require("./router_pages/zite-kiwipedia.vue");
 var Settings = require("./router_pages/settings.vue");
 var Admin = require("./router_pages/admin.vue");
 var EditZiteAdmin = require("./router_pages/edit-zite-admin.vue");
@@ -866,6 +871,10 @@ VueZeroFrameRouter.VueZeroFrameRouter_Init(Router, app, [
 	{ route: "about", component: About },
 	{ route: "settings", component: Settings },
 	{ route: "zite/zeroup", component: ZiteZeroUp },
+	{ route: "zite/zerosites", component: ZiteZeroSites },
+	{ route: "zite/zerolist", component: ZiteZeroList },
+	{ route: "zite/zerotalk", component: ZiteZeroTalk },
+	{ route: "zite/kiwipedia", component: ZiteKiwipedia },
 	{ route: "my-bookmarks", component: MyBookmarks },
 	{ route: "my-zites", component: MyZites },
 	{ route: "edit-zite/:ziteid", component: EditZite },

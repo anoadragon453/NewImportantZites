@@ -37,11 +37,11 @@
                 <div class="card" v-for="result in results">
                     <div class="card-content">
                         <span class="card-title" style="margin-bottom: 0;">
-                            <a :href="result.dllink">{{ result.title }}</a>
+                            <a :href="getDownloadLink">{{ result.title }}</a>
                         </span>
                         <div>
                             Uploaded by {{ result.cert_user_id }} | {{ result.directory.replace(/users\//, "").replace(/\//g, "") }}<br>
-                            File Size: {{ result.filesize }} MB, Date Uploaded: {{ result.filedate.toLocaleString() }}
+                            File Size: {{ getFilesize(result) }} MB, Date Uploaded: {{ getFiledate(result).toLocaleString() }}
                         </div>
                         <small>{{ result.file_name }}</small>
                     </div>
@@ -76,11 +76,12 @@
 			return {
                 //categoriesSidebar: categoriesSidebar,
                 loading: true,
-                db: null,
                 results: [],
                 searchQuery: "",
 				pageNum: 0,
-				searchQuery: ""
+                searchQuery: "",
+                address: "1uPLoaDwKzP6MCGoVzw48r4pxawRBdmQc",
+                dbfile: "zeroup.db"
 			}
 		},
 		beforeMount: function() {
@@ -103,31 +104,32 @@
 			goto: function(to) {
 				Router.navigate(to);
             },
+            getDownloadLink: function(result) {
+                return "/1uPLoaDwKzP6MCGoVzw48r4pxawRBdmQc/data/users/"+result.directory+"/"+result.file_name; 
+            },
+            getFilesize: function(result) {
+                return (result.size/1024/1024).toFixed(2);
+            },
+            getFiledate: function(result) {
+                return new Date(result.date_added*1000);
+            },
             getCorsAndDb: function() {
                 var self = this;
-                if(page.siteInfo.settings.permissions.indexOf("Cors:1uPLoaDwKzP6MCGoVzw48r4pxawRBdmQc") < 0) {
-                    page.cmd("corsPermission", "1uPLoaDwKzP6MCGoVzw48r4pxawRBdmQc", function() {
+                if(page.siteInfo.settings.permissions.indexOf("Cors:" + self.address) < 0) {
+                    page.cmd("corsPermission", self.address, function() {
                         page.cmd("fileGet",
                         {
-                            "inner_path": 'cors-1uPLoaDwKzP6MCGoVzw48r4pxawRBdmQc/data/users/zeroup.db',
+                            "inner_path": 'cors-' + self.address + '/data/users/' + self.dbfile,
                             "format": 'base64'
                             }, function(data) {
-                                self.loading = false;
-                                var uIntuArray = new Uint8Array(Base64Binary.decodeArrayBuffer(data));
-                                self.db = new SQL.Database(uInt8Array);
-                                //fetchfromdb(searchterm)
                                 self.getResults();
                             });
                         });
                 } else {
                     page.cmd("fileGet", {
-                            "inner_path": 'cors-1uPLoaDwKzP6MCGoVzw48r4pxawRBdmQc/data/users/zeroup.db',
+                            "inner_path": 'cors-' + self.address + '/data/users/' + self.dbfile,
                             "format": 'base64'
                         }, function(data) {
-                            self.loading = false;
-                            var uInt8Array = new Uint8Array(Base64Binary.decodeArrayBuffer(data));
-                            self.db = new SQL.Database(uInt8Array);
-                            //fetchfromdb(searchterm)
                             self.getResults();
                         });
                 }
@@ -143,7 +145,7 @@
                         { col: "title", score: 5 },
                         { col: "file_name", score: 4 },
                         { col: "cert_user_id", score: 3, usingJson: true },
-                        //{ col: "directory", score: 2 },
+                        //{ col: "directory", score: 2, usingJson: true },
                         { col: "date_added", score: 1 }
                     ],
                     table: "file",
@@ -153,9 +155,23 @@
                     limit: 12
                 });
 
-                var files = self.db.exec(query);
+                page.cmd("as", [self.address, "dbQuery", [query]], function(results) {
+                    self.results = results;
+                    console.log(results);
+                    self.loading = false;
+                });
 
-                self.results = [];
+                //var files = db.exec(query);
+
+                /*if (files.length == 0 && self.pageNum != 0) {
+                    self.pageNum--;
+                    //self.getResults();
+                    return;
+                }*/
+
+                //console.log(files);
+
+                /*self.results = [];
                 for (var i = 0; i < files[0].values.length; i++) {
                     var result = {};
                     for (var j = 0; j < files[0].columns.length; j++) {
@@ -164,15 +180,17 @@
                         }
                         result[files[0].columns[j]] = files[0].values[i][j];
                     }
-                    result["dllink"] = "/1uPLoaDwKzP6MCGoVzw48r4pxawRBdmQc/data/users/"+result.directory+"/"+result.file_name;
-                    result["filesize"] = (result.size/1024/1024).toFixed(2);
+                    result["dllink"] = "/1uPLoaDwKzP6MCGoVzw48r4pxawRBdmQc/data/users/"+result.directory+"/"+result.file_name; 
                     result["filedate"] = new Date(result.date_added*1000);
                     self.results.push(result);
-                }
+                }*/
             },
 			previousPage: function() { // TODO: Scroll to top
 				this.pageNum -= 1;
-				if (this.pageNum <= 0) this.pageNum = 0;
+				if (this.pageNum < 0) {
+                    this.pageNum = 0;
+                    return;
+                }
 				this.getResults();
 			},
 			nextPage: function() {

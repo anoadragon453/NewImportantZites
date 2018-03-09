@@ -130,6 +130,7 @@ function searchDbQuery(zeroframe, searchQuery, options) {
         WHERE ${options.where || ""}
             ${options.where && searchMatchesAdded ? "AND" : ""}
             ${searchMatchesAdded ? "(" + searchMatchesAdded + ") > 0" : ""}
+        ${options.groupBy ? "GROUP BY " + options.groupBy : ""}
         ${options.orderByScore && searchMatchesOrderBy ? "ORDER BY " + beforeOrderBy + searchMatchesOrderBy : ""} ${afterOrderBy}
         ${options.limit ? "LIMIT " + options.limit : ""}
         ${options.limit ? "OFFSET " + offset : ""}
