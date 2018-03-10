@@ -87,7 +87,8 @@
                 searchQuery: "",
                 clones: [
                     { name: "ZeroTalk", address: "1TaLkFrMwvbNsooF4ioKAY9EuxTBTjipT" },
-                    { name: "ZeroDevTalk", address: "142jqssVAj2iRxMACJg2dzipB5oicZYz5w" }
+                    { name: "ZeroDevTalk", address: "142jqssVAj2iRxMACJg2dzipB5oicZYz5w" },
+                    { name: "ZeroTalk Україна", address: "193psz3yGj7EH39nyKb4A2KKBXEHT49Csf" }
                 ],
                 address: "1TaLkFrMwvbNsooF4ioKAY9EuxTBTjipT",
                 dbfile: "zerotalk.db"
