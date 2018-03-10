@@ -2,13 +2,12 @@
 	<div id="categories">
     	<div class="card">
     		<div class="card-content">
-	        	<!--<span class="card-title center-align">Categories</span>-->
-				<div class="center-align side-header">Categories</div>
+				<div class="center-align side-header">{{ langTranslation["Categories"] }}</div>
 	        	<ul class="collection">
-					<a class="collection-item center-align" :class="{ 'active': isActive('') }" href="./?/">All</a>
-	        		<a class="collection-item center-align" v-for="category in categories" :class="{ 'active': isActive(category.slug) }" :href="'./?/category/' + category.slug">{{ category.name }}</a>
+					<a class="collection-item center-align" :class="{ 'active': isActive('') }" href="./?/">{{ langTranslation["All"] }}</a>
+	        		<a class="collection-item center-align" v-for="category in categories" :class="{ 'active': isActive(category.slug) }" :href="'./?/category/' + category.slug">{{ langTranslation[category.name] }}</a>
 	        	</ul>
-				<div class="center-align side-header">Search Other Zites</div>
+				<div class="center-align side-header">{{ langTranslation["Search Other Zites"] }}</div>
 				<ul class="collection">
 					<a class="collection-item center-align" :class="{ 'active': false }" :href="'./?/zite/zeroup'" v-on:click.prevent="goto('zite/zeroup');">ZeroUp</a>
 					<a class="collection-item center-align" :class="{ 'active': false }" :href="'./?/zite/zerosites'" v-on:click.prevent="goto('zite/zerosites');">ZeroSites</a>
@@ -38,7 +37,7 @@
 	var Router = require("../libs/router.js");
 
 	module.exports = {
-		props: ["categories"],
+		props: ["categories", "langTranslation"],
 		name: "categories",
 		methods: {
 			goto: function(to) {

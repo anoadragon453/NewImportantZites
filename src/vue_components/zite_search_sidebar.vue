@@ -4,10 +4,10 @@
             <div class="card-content">
                 <slot></slot>
 
-				<div class="center-align side-header">Search Other Zites</div>
+				<div class="center-align side-header">{{ langTranslation["Search Other Zites"] }}</div>
 
 				<ul class="collection">
-					<a class="collection-item center-align" :class="{ 'active': false }" :href="'./?/'" v-on:click.prevent="goto('');">Important Zites</a>
+					<a class="collection-item center-align" :class="{ 'active': false }" :href="'./?/'" v-on:click.prevent="goto('');">{{ langTranslation["Important Zites"] }}</a>
 					<a class="collection-item center-align" :class="{ 'active': false }" :href="'./?/zite/zeroup'" v-on:click.prevent="goto('zite/zeroup');">ZeroUp</a>
 					<a class="collection-item center-align" :class="{ 'active': false }" :href="'./?/zite/zerosites'" v-on:click.prevent="goto('zite/zerosites');">ZeroSites</a>
 					<a class="collection-item center-align" :class="{ 'active': false }" :href="'./?/zite/zerolist'" v-on:click.prevent="goto('zite/zerolist');">0List</a>
@@ -34,6 +34,7 @@
 	var Router = require("../libs/router.js");
 
 	module.exports = {
+		props: ["langTranslation"],
 		name: "zite-search-sidebar",
 		methods: {
 			goto: function(to) {

@@ -6,7 +6,7 @@
 					<div class="nav-wrapper">
 					<form onsubmit="return false;">
 						<div class="input-field">
-						<input id="search" type="search" placeholder="Search ZeroSites" v-on:input="getResults" v-on:keyup.enter="searchEnter" v-model="searchQuery" required>
+						<input id="search" type="search" :placeholder="langTranslation['Search ...'].replace(/\.\.\./, 'ZeroSites')" v-on:input="getResults" v-on:keyup.enter="searchEnter" v-model="searchQuery" required>
 						<label class="label-icon" for="search"><i class="material-icons">search</i></label>
 						<i class="material-icons" v-on:click.prevent="clearSearch()">close</i>
 						</div>
@@ -33,7 +33,7 @@
                         </span>
                         <div>{{ result.description }}</div>
                         <small>
-                            Published by {{ result.cert_user_id }} | {{ result.directory.replace(/users\//, "").replace(/\//g, "") }} <br>
+                            {{ langTranslation["Published by ..."].replace(/\.\.\./, result.cert_user_id) }} | {{ result.directory.replace(/users\//, "").replace(/\//g, "") }} <br>
                             <em><a :href="'#'" v-on:click.prevent="importZite(result)">Import Into Important Zites</a></em>
                         </small>
                     </div>
@@ -46,7 +46,7 @@
 				</ul>
 	        </div>
 	        <div class="col s12 m12 l3">
-	        	<component :is="categoriesSidebar" :categories="categories"></component>
+	        	<!--<component :is="categoriesSidebar" :categories="categories"></component>-->
 	        </div>
 	    </div>
 	</div>
@@ -59,7 +59,7 @@
     var searchDbQuery = require("../libs/search.js");
 
 	module.exports = {
-		props: ["userInfo"],
+		props: ["userInfo", "langTranslation"],
 		name: "ZiteZeroSites",
 		data: () => {
 			return {

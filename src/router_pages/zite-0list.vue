@@ -6,7 +6,7 @@
 					<div class="nav-wrapper">
 					<form onsubmit="return false;">
 						<div class="input-field">
-						<input id="search" type="search" placeholder="Search 0List" v-on:input.prevent="getResults" v-on:keyup.enter="searchEnter($event)" v-model="searchQuery" required>
+						<input id="search" type="search" :placeholder="langTranslation['Search ...'].replace(/\.\.\./, '0List')" v-on:input.prevent="getResults" v-on:keyup.enter="searchEnter($event)" v-model="searchQuery" required>
 						<label class="label-icon" for="search"><i class="material-icons">search</i></label>
 						<i class="material-icons" v-on:click.prevent="clearSearch()">close</i>
 						</div>
@@ -32,7 +32,7 @@
                             <a :href="getAddress(result)">{{ result.title }}</a>
                         </span>
                         <small>
-                            Published by {{ result.directory.replace(/users\//, "").replace(/\//g, "") }} <em>| <a :href="getTopicUrl(result)">Goto 0List Topic</a> | <a href="#" v-on:click.prevent="importZite(result)">Import Into Important Zites</a></em>
+                            {{ langTranslation["Published by ..."].replace(/\.\.\./, result.directory.replace(/users\//, "").replace(/\//g, "")) }} <em>| <a :href="getTopicUrl(result)">Goto 0List Topic</a> | <a href="#" v-on:click.prevent="importZite(result)">Import Into Important Zites</a></em>
                         </small>
                     </div>
                 </div>
@@ -45,7 +45,7 @@
 				</ul>
 	        </div>
 	        <div class="col s12 m12 l3">
-	        	<component :is="categoriesSidebar" :categories="categories"></component>
+	        	<!--<component :is="categoriesSidebar" :categories="categories"></component>-->
 	        </div>
 	    </div>
 	</div>
@@ -58,7 +58,7 @@
     var searchDbQuery = require("../libs/search.js");
 
 	module.exports = {
-		props: ["userInfo"],
+		props: ["userInfo", "langTranslation"],
 		name: "ZiteZeroList",
 		data: () => {
 			return {

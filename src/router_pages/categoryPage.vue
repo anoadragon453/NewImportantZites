@@ -7,8 +7,8 @@
 					<div class="nav-wrapper">
 						<form onsubmit="return false;">
 							<div class="row" style="padding: 0; margin: 0; height: 100%;">
-								<div class="input-field col s10 m11 l12" style="display: inline-block; margin: 0; padding: 0;">
-									<input id="search" type="search" :placeholder="'Search' + (categoryName ? ' in ' + categoryName + ' Category' : '')" v-on:keyup.enter="searchEnter($event)" v-on:input.prevent="getZites" v-model="searchQuery" required style="margin: 0;">
+								<div class="input-field col s10 m11 l12" style="display: inline-block; margin: 0; padding: 0;"> <!-- TODO: Translate placeholder -->
+									<input id="search" type="search" :placeholder="categoryName ? langTranslation['Search In ... Category'].replace(/\.\.\./, langTranslation[categoryName]) : 'Search'" v-on:keyup.enter="searchEnter($event)" v-on:input.prevent="getZites" v-model="searchQuery" required style="margin: 0;">
 									<label class="label-icon" for="search" style="padding-left: 10px;"><i class="material-icons">search</i></label>
 									<i class="material-icons" style="padding-right: 10px;" v-on:click.prevent="clearSearch()">close</i>
 								</div>
@@ -23,17 +23,11 @@
 				</nav>
 
 				<ul id='searchDropdown' class='dropdown-content' ref="searchDropdown">
-					<li><a href="./?/" v-on:click.prevent="goto('')">All</a></li>
-					<li v-for="category in categories" :class="{ 'active': currentCategory == category.slug }"><a :href="'./?/category/' + category.slug">{{ category.name }}</a></li>
+					<li><a href="./?/" v-on:click.prevent="goto('')">{{ langTranslation["All"] }}</a></li>
+					<li v-for="category in categories" :class="{ 'active': currentCategory == category.slug }"><a :href="'./?/category/' + category.slug">{{ langTranslation[category.name] }}</a></li>
 				</ul>
 
-                <!--<ul class="pagination" v-if="zites.length >= 4">
-					<li><a href="#!" v-on:click.prevent="previousPage"><i class="material-icons">chevron_left</i></a></li>
-					<li class="disabled"><a href="#!">{{ pageNum + 1 }}</a></li>
-					<li><a href="#!" v-on:click.prevent="nextPage"><i class="material-icons">chevron_right</i></a></li>
-				</ul> -->
-
-				<component :is="zite_list_item" :user-info="userInfo" v-for="zite in zites" :zite="zite" :show-category="true" :categories="categories" v-on:update="getZites()"></component>
+				<component :is="zite_list_item" :user-info="userInfo" v-for="zite in zites" :zite="zite" :show-category="true" :categories="categories" v-on:update="getZites()" :lang-translation="langTranslation"></component>
 
 				<ul class="pagination center-align" v-if="zites.length != 0">
 					<li><a href="#!" v-on:click.prevent="previousPage"><i class="material-icons">chevron_left</i></a></li>
@@ -42,7 +36,7 @@
 				</ul>
 	        </div>
 	        <div class="col s12 m12 l3 hide-on-med-and-down">
-	        	<component :is="categoriesSidebar" :categories="categories"></component>
+	        	<component :is="categoriesSidebar" :categories="categories" :lang-translation="langTranslation"></component>
 	        </div>
 	    </div>
 	</div>
@@ -54,7 +48,7 @@
 	var ziteListItem = require("../vue_components/zite_list_item.vue");
 
 	module.exports = {
-		props: ["userInfo"],
+		props: ["userInfo", "langTranslation"],
 		name: "categoryPage",
 		data: () => {
 			return {

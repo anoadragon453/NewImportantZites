@@ -7,7 +7,7 @@
 					<form onsubmit="return false;">
                         <div class="row" style="padding: 0; margin: 0; height: 100%;">
                             <div class="input-field col s10 m11 l12" style="display: inline-block; margin: 0; padding: 0;">
-                                <input id="search" type="search" placeholder="Search ZeroTalk" v-on:input.prevent="getResults" v-on:keyup.enter="searchEnter($event)" v-model="searchQuery" required style="margin: 0;">
+                                <input id="search" type="search" :placeholder="langTranslation['Search ...'].replace(/\.\.\./, 'ZeroTalk')" v-on:input.prevent="getResults" v-on:keyup.enter="searchEnter($event)" v-model="searchQuery" required style="margin: 0;">
                                 <label class="label-icon" for="search" style="padding-left: 10px;"><i class="material-icons">search</i></label>
                                 <i class="material-icons" style="padding-right: 10px;" v-on:click.prevent="clearSearch()">close</i>
                             </div>
@@ -45,7 +45,7 @@
                         <div class="truncate">{{ cleanupBody(result)}}</div>
                         <div v-if="getAddress(result)"><a :href="getAddress(result)">{{getAddress(result)}}</a></div>
                         <small>
-                            Published by {{ result.topic_creator_user_name }} | {{ result.directory.replace(/users\//, "").replace(/\//g, "") }}
+                            {{ langTranslation["Published by ..."].replace(/\.\.\./, result.topic_creator_user_name) }} | {{ result.directory.replace(/users\//, "").replace(/\//g, "") }}
                         </small>
                     </div>
                 </div>
@@ -57,8 +57,8 @@
 				</ul>
 	        </div>
 	        <div class="col s12 m12 l3">
-                <component :is="zite_search_sidebar">
-                    <div class="center-align side-header">ZeroTalk Clones</div>
+                <component :is="zite_search_sidebar" :lang-translation="langTranslation">
+                    <div class="center-align side-header">{{ langTranslation["... Clones"].replace(/\.\.\./, "ZeroTalk") }}</div>
                     <ul class="collection">
                         <a class="collection-item center-align" href="#" v-for="clone in clones" :class="{ 'active': address == clone.address }" v-on:click.prevent="switchClone(clone)" :key="clone.address">{{ clone.name }}</a>
                     </ul>
@@ -74,7 +74,7 @@
     var searchDbQuery = require("../libs/search.js");
 
 	module.exports = {
-		props: ["userInfo"],
+		props: ["userInfo", "langTranslation"],
 		name: "ZiteZeroTalk",
 		data: () => {
 			return {

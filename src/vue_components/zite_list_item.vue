@@ -5,15 +5,15 @@
 				<a :href="'/' + (zite.domain || zite.address)">{{ (zite.merger_category && !zite.merger_supported ? zite.merger_category + ": " : "") + zite.title }}</a>
 			</span>
 			<div> <!-- limit text amount in some way, truncate? -->
-				<span v-if="isNSFW" style="color: red; margin-right: 5px;">NSFW </span>{{ zite.description }}
+				<span v-if="isNSFW" style="color: red; margin-right: 5px;">{{ langTranslation["NSFW"] }} </span>{{ zite.description }}
 			</div>
             <!-- Add Zite Creator -->
 			<small>
                 <!--Published {{ getDate }} <span>by <a href="#">{{ getName }}</a><span v-if="showCategory"> in <a href="#">{{ getCategoryName }}</a></span></span><br>-->
-                Created by <a href="#">{{ zite.creator }}</a><span v-if="zite.creator.toLowerCase().replace(/@.*/g, '').replace(/\s/g, '') != getName.toLowerCase()">, Submitted by <a href="#">{{ getName }}</a></span>
-				<em v-if="userIsOwner"> | <a :href="'edit-zie/' + zite.id" v-on:click.prevent="goto('edit-zite/' + zite.id)">Edit</a> | <a href="#" v-on:click.prevent="deleteZite()">Delete</a></em>
-				<em v-if="zite.merger_category && zite.merger_supported"> | <a href="#" v-on:click.prevent="toggleMergerZites()">Show Merger Zites</a></em>
-				<em v-if="userInfo"> | <a href="#" v-on:click.prevent="toggleBookmark()">{{ zite.bookmarkCount >= 1 ? "Unbookmark" : "Bookmark" }}</a>
+                {{ langTranslation["Created by ..."].replace(/\.\.\./, zite.creator) }}<span v-if="zite.creator.toLowerCase().replace(/@.*/g, '').replace(/\s/g, '') != getName.toLowerCase()">, {{ langTranslation["Submitted by ..."].replace(/\.\.\./, getName) }}</span>
+				<em v-if="userIsOwner"> | <a :href="'edit-zie/' + zite.id" v-on:click.prevent="goto('edit-zite/' + zite.id)">{{ langTranslation["Edit"] }}</a> | <a href="#" v-on:click.prevent="deleteZite()">{{ langTranslation["Delete"] }}</a></em>
+				<em v-if="zite.merger_category && zite.merger_supported"> | <a href="#" v-on:click.prevent="toggleMergerZites()">{{ langTranslation["Show Merger Zites"] }}</a></em>
+				<em v-if="userInfo"> | <a href="#" v-on:click.prevent="toggleBookmark()">{{ zite.bookmarkCount >= 1 ? langTranslation["Unbookmark"] : langTranslation["Bookmark"] }}</a>
 				<span v-if="userInfo && userInfo.privatekey" style="float: right;"><a :href="'./?/admin/edit/' + getAuthAddress + '/' + zite.id" v-on:click.prevent="goto('admin/edit/' + getAuthAddress + '/' + zite.id)">Admin Edit</a> | <a href="#" v-on:click.prevent="deleteZiteAdmin()">Admin Delete</a></span></em>
             </small>
 		</div>
@@ -35,7 +35,7 @@
 	var Router = require("../libs/router.js");
 
 	module.exports = {
-		props: ["userInfo", "zite", "showCategory", "categories"],
+		props: ["userInfo", "zite", "showCategory", "categories", "langTranslation"],
 		name: "zite-list-item",
 		data: function() {
 			return {

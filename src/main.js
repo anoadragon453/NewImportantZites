@@ -3,6 +3,9 @@ ziteLanguages = [
 	"DA", "DE", "EN", "ES", "EO", "FR", "HU", "IT", "NL", "PL", "PT", "PT-BR", "RU", "TR", "UK", "ZH", "ZH-TW"
 ];
 
+var defaultLang = require("./default-lang.js");
+console.log(defaultLang);
+
 var anime = require("animejs");
 window.anime = anime;
 var Materialize = require("materialize-css/dist/js/materialize.min.js");
@@ -31,15 +34,16 @@ var Navbar = require("./vue_components/navbar.vue");
 var app = new Vue({
 	el: "#app",
 	template: `<div>
-			<component ref="navbar" :is="navbar" :user-info="userInfo"></component>
-			<component ref="view" :is="currentView" v-on:get-user-info="getUserInfo()" :user-info="userInfo" :zite-to-import="ziteToImport" v-on:import-zite="importZite"></component>
+			<component ref="navbar" :is="navbar" :user-info="userInfo" :lang-translation="langTranslation"></component>
+			<component ref="view" :is="currentView" v-on:get-user-info="getUserInfo()" :user-info="userInfo" :zite-to-import="ziteToImport" v-on:import-zite="importZite" :lang-translation="langTranslation"></component>
 		</div>`,
 	data: {
 		navbar: Navbar,
 		currentView: null,
 		siteInfo: null,
 		userInfo: null,
-		ziteToImport: null
+		ziteToImport: null,
+		langTranslation: defaultLang
 	},
 	methods: {
 		getUserInfo: function(f = null) {
@@ -89,8 +93,22 @@ class ZeroApp extends ZeroFrame {
 	onOpenWebsocket() {
 		var self = this;
 
-		this.cmdp("siteInfo", {})
-			.then((siteInfo) => {
+		this.cmdp("serverInfo", {})
+			.then((serverInfo) => {
+				console.log(serverInfo);
+				self.serverInfo = serverInfo;
+				app.serverInfo = serverInfo;
+				return this.cmdp("fileGet", { "inner_path": "languages/" + self.serverInfo.language + ".json", "required": false })
+			}).then((data) => {
+				data = JSON.parse(data);
+				console.log("langdata: ", data);
+				if (data) {
+					app.langTranslation = data;
+					app.$emit("setLanguage", data);
+				}
+				return this.cmdp("siteInfo", {});
+			}).then((siteInfo) => {
+				console.log(siteInfo);
 				self.siteInfo = siteInfo;
 				app.siteInfo = siteInfo;
 				app.getUserInfo();

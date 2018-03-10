@@ -5,73 +5,73 @@
 	        	<!--<component :is="topic_navbar" active="ask" :user-info="userInfo"></component>-->
 	        	<div class="card">
 	        		<div class="card-content">
-	        			<span class="card-title">Edit Zite</span>
+	        			<span class="card-title">{{ langTranslation["Edit Zite"] }}</span>
 		        		<!-- Using form so I can get html5 form validation -->
 		        		<form v-on:submit.prevent="editZite()">
 			        		<div class="input-field">
 			        			<input ref="title" id="title" v-model="title" type="text" class="validate" v-on:change="titleChanged()" required>
-			        			<label for="title">Title *</label>
+			        			<label for="title">{{ langTranslation["Title"] }} *</label>
 			        		</div>
 
 			        		<div class="input-field">
 			        			<input ref="address" id="address" v-model="address" type="text" class="validate" v-on:change="addressChanged()" required>
-			        			<label for="address">Zite Address * (Not .bit Domain)</label>
+			        			<label for="address">{{ langTranslation["Zite Address (Not .bit Address)"] }} *</label>
 			        		</div>
 
 			        		<div class="input-field">
 			        			<input ref="domain" id="domain" v-model="domain" type="text" class="validate" v-on:change="domainChanged()">
-			        			<label for="domain">Zite .bit Domain (if exists)</label>
+			        			<label for="domain">{{ langTranslation["Zite .bit Domain (if exists)"] }}</label>
 			        		</div>
 
                             <div class="input-field">
 			        			<input ref="creator" id="creator" v-model="creator" v-on:change="creatorChanged()" type="text" class="validate" required>
-			        			<label for="creator">Zite Creator/Maintainer *</label>
+			        			<label for="creator">{{ langTranslation["Zite Creator / Maintainer"] }} *</label>
 			        		</div>
 
 			        		<div class="input-field">
 			        			<textarea ref="description" id="description" class="materialize-textarea validate" required v-model="description"></textarea>
-			        			<label for="description">Description *</label>
+			        			<label for="description">{{ langTranslation["Description"] }} *</label>
 			        		</div>
 
                             <div class="input-field col s12">
                                 <select id="categoryselect"  ref="categoryselect" v-model="category" :value="category" v-on:change="updateTagsAutocompletion" required>
-                                    <option value="" disabled selected>Choose your option</option>
+                                    <option value="" disabled selected>{{ langTranslation["Choose Your Option"] }}</option>
                                     <option v-for="category in categories" :value="category.slug">{{ category.name }}</option>
                                 </select>
-                                <label for="categoryselect">Category *</label>
+                                <label for="categoryselect">{{ langTranslation["Category"] }} *</label>
                             </div>
 
                             <div class="input-field col s12">
                                 <select id="languageselect"  ref="languageselect" v-model="languages" :value="languages" multiple required>
-                                    <option value="" disabled selected>Choose your option</option>
+                                    <option value="" disabled selected>{{ langTranslation["Choose Your Option"] }}</option>
                                     <option v-for="language in ziteLanguages" :value="language">{{ language }}</option>
                                 </select>
-                                <label for="categoryselect">Language(s) *</label>
+                                <label for="categoryselect">{{ langTranslation["Language(s)"] }} *</label>
                             </div>
 
 							<div class="chips chips-placeholder" ref="tags" style="margin-bottom: 0;"></div>
-							<small>Press enter to add tag</small><br>
+							<small>{{ langTranslation["Press Enter to Add Tag"] }}</small><br>
                             <br>
                             <label>
                                 <input type="checkbox" v-model="nsfw" />
-                                <span>NSFW</span>
+                                <span>{{ langTranslation["NSFW"] }}</span>
                             </label>
 
                             <div>
                                 <label>
                                     <input type="checkbox" v-model="mergerSupported" />
-                                    <span>Merger-Supported (<em>more info in sidebar, or below on mobile</em>)</span>
+                                    <span>{{ langTranslation["Merger-Supported (more info in sidebar, or below on mobile)"] }}</span>
                                 </label>
                             </div>
                             <div class="input-field">
 			        			<input id="mergerCategory" ref="mergercategory" v-model="mergerCategory" v-on:change="mergerCategoryChanged()" type="text" class="validate autocomplete">
-			        			<label for="mergerCategory">Merger Category Name</label>
+			        			<label for="mergerCategory">{{ langTranslation["Merger Category Name"] }}</label>
 			        		</div>
                             
 							<br>
-			        		<button type="submit" class="btn waves-effect waves-light" :class="{ 'disabled': submitBtnDisabled }">Submit</button>
+			        		<button type="submit" class="btn waves-effect waves-light" :class="{ 'disabled': submitBtnDisabled }">{{ langTranslation["Submit"] }}</button>
 							<br>
-							<small><em style="text-color: red;">* required</em></small>
+							<small><em style="text-color: red;">* {{ langTranslation["Required"] }}</em></small>
 			        	</form>
 			        </div>
 	        	</div>
@@ -95,7 +95,7 @@
 	var M = require("materialize-css");
 
 	module.exports = {
-		props: ["userInfo"],
+		props: ["userInfo", "langTranslation"],
 		name: "EditZite",
 		data: () => {
 			return {
@@ -133,7 +133,11 @@
 				var self = this;
 				page.getCategories()
 					.then((categories) => {
+						for (var i = 0; i < categories.length; i++) {
+							categories[i].name = self.langTranslation[categories[i].name];
+						}
 						self.categories = categories;
+						self.$forceUpdate();
 
 						if (!userInfo || !userInfo.auth_address) return; // Not logged in
 						return page.getZite(userInfo.auth_address, Router.currentParams["ziteid"]);
@@ -217,8 +221,8 @@
 						}
 					}
 					this.tagsInstance = M.Chips.init(tags, {
-						placeholder: "Enter tags",
-						secondaryPlaceholder: "+Tag",
+						placeholder: this.langTranslation["Enter Tags"],
+						secondaryPlaceholder: "+" + this.langTranslation["Tags"],
 						autocompleteOptions: {
 							data: autocompleteData,
 							limit: Infinity

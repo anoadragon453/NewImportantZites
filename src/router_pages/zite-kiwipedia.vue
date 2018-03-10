@@ -5,8 +5,8 @@
 				<nav style="background-color: #4caf50; margin-bottom: .8rem; margin-top: 8px;">
 					<div class="nav-wrapper">
 					<form onsubmit="return false;">
-						<div class="input-field">
-						<input id="search" type="search" placeholder="Search Kiwipedia (On Enter)" v-on:keyup.enter="searchEnter" v-model="searchQuery" required>
+						<div class="input-field"> <!-- TODO: Change to "Search ... (On Enter)" -->
+						<input id="search" type="search" :placeholder="langTranslation['Search ...'].replace(/\.\.\./, 'Kiwipedia') + ' (On Enter)'" v-on:keyup.enter="searchEnter" v-model="searchQuery" required>
 						<label class="label-icon" for="search"><i class="material-icons">search</i></label>
 						<i class="material-icons" v-on:click.prevent="clearSearch()">close</i>
 						</div>
@@ -55,7 +55,7 @@
     var searchDbQuery = require("../libs/search.js");
 
 	module.exports = {
-		props: ["userInfo"],
+		props: ["userInfo", "langTranslation"],
 		name: "ZiteKiwipedia",
 		data: () => {
 			return {

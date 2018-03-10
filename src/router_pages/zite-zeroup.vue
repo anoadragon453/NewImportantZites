@@ -6,7 +6,7 @@
 					<div class="nav-wrapper">
 					<form onsubmit="return false;">
 						<div class="input-field">
-						<input id="search" type="search" placeholder="Search ZeroUp" v-on:input.prevent="getResults" v-on:keyup.enter="searchEnter($event)" v-model="searchQuery" required>
+						<input id="search" type="search" :placeholder="langTranslation['Search ...'].replace(/\.\.\./, 'ZeroUp')" v-on:input.prevent="getResults" v-on:keyup.enter="searchEnter($event)" v-model="searchQuery" required>
 						<label class="label-icon" for="search"><i class="material-icons">search</i></label>
 						<i class="material-icons" v-on:click.prevent="clearSearch()">close</i>
 						</div>
@@ -32,8 +32,8 @@
                             <a :href="getDownloadLink">{{ result.title }}</a>
                         </span>
                         <div>
-                            Uploaded by {{ result.cert_user_id }} | {{ result.directory.replace(/users\//, "").replace(/\//g, "") }}<br>
-                            File Size: {{ getFilesize(result) }} MB, Date Uploaded: {{ getFiledate(result).toLocaleString() }}
+                            {{ langTranslation["Uploaded by ..."].replace(/\.\.\./, result.cert_user_id) }} | {{ result.directory.replace(/users\//, "").replace(/\//g, "") }}<br>
+                            {{ langTranslation["File Size"] }}: {{ getFilesize(result) }} MB, {{ langTranslation["Date Uploaded"] }}: {{ getFiledate(result).toLocaleString() }}
                         </div>
                         <small>{{ result.file_name }}</small>
                     </div>
@@ -46,7 +46,7 @@
 				</ul>
 	        </div>
 	        <div class="col s12 m12 l3">
-	        	<component :is="categoriesSidebar" :categories="categories"></component>
+	        	<!--<component :is="categoriesSidebar" :categories="categories"></component>-->
 	        </div>
 	    </div>
 	</div>
@@ -59,7 +59,7 @@
     var searchDbQuery = require("../libs/search.js");
 
 	module.exports = {
-		props: ["userInfo"],
+		props: ["userInfo", "langTranslation"],
 		name: "ZiteZeroUp",
 		data: () => {
 			return {

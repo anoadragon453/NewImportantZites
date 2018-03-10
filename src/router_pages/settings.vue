@@ -4,18 +4,18 @@
 	        <div class="col s12 m12 l9">
 	        	<div class="card">
 	        		<div class="card-content">
-	        			<span class="card-title">Add New Zite</span>
+	        			<span class="card-title">{{ langTranslation["Settings"] }}</span>
 		        		<!-- Using form so I can get html5 form validation -->
 		        		<form v-on:submit.prevent="updateSettings()">
                             <div class="input-field col s12">
                                 <select id="languageselect"  ref="languageselect" v-model="languages" multiple required>
-                                    <option value="" disabled selected>Choose your option</option>
+                                    <option value="" disabled selected>{{ langTranslation["Choose Your Option"] }}</option>
                                     <option v-for="language in ziteLanguages" :value="language">{{ language }}</option>
                                 </select>
-                                <label for="categoryselect">Language(s) *</label>
+                                <label for="categoryselect">{{ langTranslation["Language(s)"] }} *</label>
                             </div>
 							<br>
-			        		<button type="submit" class="btn waves-effect waves-light" :class="{ 'disabled': submitBtnDisabled }">Update</button>
+			        		<button type="submit" class="btn waves-effect waves-light" :class="{ 'disabled': submitBtnDisabled }">{{ langTranslation["Submit"] }}</button>
 			        	</form>
 			        </div>
 	        	</div>
@@ -31,7 +31,7 @@
     var M = require("materialize-css");
 
 	module.exports = {
-		props: ["userInfo"],
+		props: ["userInfo", "langTranslation"],
 		name: "settings",
 		data: () => {
 			return {
