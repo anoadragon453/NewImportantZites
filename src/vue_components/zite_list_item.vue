@@ -23,7 +23,7 @@
 			</div>
 			<div v-for="zite in mergerZites" style="margin-bottom: 5px;">
 				<div class="truncate">
-					<strong><a :href="'/' + (zite.domain ? zite.domain : zite.address)">{{ zite.title }}</a></strong> - <em>{{ zite.description }}</em>
+					<strong><a :href="'/' + (zite.domain ? zite.domain : zite.address)">{{ zite.title }}</a></strong> - <em>{{ zite.description }} - {{ zite.creator }}</em>
 				</div>
 			</div>
 		</div>
