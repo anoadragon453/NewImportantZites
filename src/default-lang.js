@@ -52,8 +52,12 @@ var defaultLang = {
     "Date Uploaded": "Date Uploaded",
     "Date Updated": "Date Updated",
     "Date Published": "Date Published",
-    "Search [zite name]": "Search [zite name]",
-    "[zite name] Clones": "[zite name] Clones"
+    "Search ...": "Search ...",
+    "... Clones": "... Clones",
+    "Created by ...": "Created by ...",
+    "Update": "Update",
+    "Submitted by ...": "Submitted by ...",
+    "There are no merger zites yet!": "There are no merger zites yet!"
 };
 
 module.exports = defaultLang;
