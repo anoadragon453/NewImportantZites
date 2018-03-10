@@ -68,6 +68,7 @@ function searchDbQuery(zeroframe, searchQuery, options) {
         var inSearchMatchesOrderBy = options.searchSelects[i].inSearchMatchesOrderBy != undefined ? options.searchSelects[i].inSearchMatchesOrderBy : true;
         var skip = options.searchSelects[i].skip != undefined ? options.searchSelects[i].skip : false;
         var usingJson = options.searchSelects[i].usingJson != undefined ? options.searchSelects[i].usingJson : false;
+        var having = options.searchSelects[i].having;
 
         if (!skip) {
             if (i != 0) {
@@ -131,6 +132,7 @@ function searchDbQuery(zeroframe, searchQuery, options) {
             ${options.where && searchMatchesAdded ? "AND" : ""}
             ${searchMatchesAdded ? "(" + searchMatchesAdded + ") > 0" : ""}
         ${options.groupBy ? "GROUP BY " + options.groupBy : ""}
+        ${options.having ? "HAVING " + options.having : ""}
         ${options.orderByScore && searchMatchesOrderBy ? "ORDER BY " + beforeOrderBy + searchMatchesOrderBy : ""} ${afterOrderBy}
         ${options.limit ? "LIMIT " + options.limit : ""}
         ${options.limit ? "OFFSET " + offset : ""}

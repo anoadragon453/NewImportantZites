@@ -45,7 +45,7 @@
                         <div class="truncate">{{ cleanupBody(result)}}</div>
                         <div v-if="getAddress(result)"><a :href="getAddress(result)">{{getAddress(result)}}</a></div>
                         <small>
-                            Published by {{ result.directory.replace(/users\//, "").replace(/\//g, "") }}
+                            Published by {{ result.topic_creator_user_name }} | {{ result.directory.replace(/users\//, "").replace(/\//g, "") }}
                         </small>
                     </div>
                 </div>
@@ -80,6 +80,7 @@
 			return {
                 zite_search_sidebar: ziteSearchSidebar,
                 loading: true,
+                prevResults: [],
                 results: [],
                 searchQuery: "",
 				pageNum: 0,
@@ -130,7 +131,7 @@
             getTopicUrl: function(result) {
                 var titleToUrl = result.title.replace(/[^A-Za-z0-9]/g, "+").replace(/[+]+/g, "+").replace(/[+]+$/, "");
 
-                return '/' + this.address + '/?Topic:'  + result.topic_id + '_' + result.directory.replace(/users\//, '').replace(/\//g, '') + '/' + titleToUrl;
+                return '/' + this.address + '/?Topic:'  + result.row_topic_uri + '/' + titleToUrl;
             },
             cleanupBody: function(result) {
                 return result.body.replace(/\&nbsp\;/g, "").replace(/\s/g, " ");
@@ -152,24 +153,34 @@
                 var query = searchDbQuery(page, self.searchQuery, {
                     orderByScore: true,
                     id_col: "topic_id",
-                    select: "*",
+                    select: `topic.*, json.directory,
+                        topic.topic_id || '_' || topic_creator_content.directory AS row_topic_uri,
+                        topic_creator_user.value AS topic_creator_user_name,
+                        CASE WHEN MAX(comment.added) IS NULL THEN topic.added ELSE MAX(comment.added) END as last_action`,
                     searchSelects: [
                         { col: "title", score: 5 },
                         { col: "body", score: 4 },
                         //{ col: "cert_user_id", score: 3, usingJson: true }, // 0list puts this in keyvalue instead of json table for some reason
                         //{ col: "directory", score: 2, usingJson: true },
-                        { col: "added", score: 1 }
+                        //{ col: "added", score: 1 }
                     ],
                     table: "topic",
-                    join: "LEFT JOIN json USING (json_id)",
+                    join: `LEFT JOIN json USING (json_id)
+                        LEFT JOIN json AS topic_creator_content ON (topic_creator_content.directory = json.directory AND topic_creator_content.file_name = 'content.json')
+                        LEFT JOIN keyvalue AS topic_creator_user ON (topic_creator_user.json_id = topic_creator_content.json_id AND topic_creator_user.key = 'cert_user_id')
+                        LEFT JOIN comment ON (comment.topic_uri = row_topic_uri AND comment.added < ${Date.now()/1000+120})`,
                     page: self.pageNum,
-                    afterOrderBy: "added DESC",
+                    afterOrderBy: `last_action DESC`,
+                    groupBy: "topic.topic_id, topic.json_id",
+                    having: `last_action < ${Date.now()/1000+120}`,
                     limit: 12
                 });
 
-                page.cmd("as", [self.address, "dbQuery", [query]], function(results) {
+                page.cmdp("as", [self.address, "dbQuery", [query]]).then(function(results) {
                     if (results.length == 0 && self.pageNum != 0) {
                         self.pageNum--;
+                        self.results = self.prevResults;
+                        self.loading = false;
                         return;
                     }
                     self.results = results;
@@ -183,18 +194,21 @@
                     this.pageNum = 0;
                     return;
                 }
+                this.prevResults = this.results;
                 this.results = [];
                 this.loading = true;
 				this.getResults();
 			},
 			nextPage: function() {
 				this.pageNum += 1;
+                this.prevResults = this.results;
                 this.results = [];
                 this.loading = true;
 				this.getResults();
             },
 			clearSearch: function() {
                 this.searchQuery = "";
+                this.prevResults = this.results;
                 this.results = [];
                 this.loading = true;
                 this.pageNum = 0;

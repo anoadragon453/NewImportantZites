@@ -64,6 +64,7 @@
 		data: () => {
 			return {
                 loading: true,
+                prevResults: [],
                 results: [],
                 searchQuery: "",
 				pageNum: 0,
@@ -123,13 +124,15 @@
                     table: "site",
                     join: "LEFT JOIN json USING (json_id)",
                     page: self.pageNum,
-                    //afterOrderBy: "date_added DESC",
+                    afterOrderBy: "date_added DESC",
                     limit: 8
                 });
 
                 page.cmd("as", [self.address, "dbQuery", [query]], function(results) {
                     if (results.length == 0 && self.pageNum != 0) {
                         self.pageNum--;
+                        self.results = self.prevResults;
+                        self.loading = false;
                         return;
                     }
                     self.results = results;
@@ -143,18 +146,21 @@
                     this.pageNum = 0;
                     return;
                 }
+                this.prevResults = this.results;
                 this.results = [];
                 this.loading = true;
 				this.getResults();
 			},
 			nextPage: function() {
 				this.pageNum += 1;
+                this.prevResults = this.results;
                 this.results = [];
                 this.loading = true;
 				this.getResults();
             },
 			clearSearch: function() {
 				this.searchQuery = "";
+                this.prevResults = this.results;
                 this.results = [];
                 this.loading = true;
                 this.pageNum = 0;

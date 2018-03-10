@@ -290,6 +290,7 @@ class ZeroApp extends ZeroFrame {
 			join: "LEFT JOIN json USING (json_id)",
 			where: languageWhere,
 			page: pageNum,
+			afterOrderBy: "date_added ASC",
 			limit: limit
 		});
 		return this.cmdp("dbQuery", [query]);
@@ -326,6 +327,7 @@ class ZeroApp extends ZeroFrame {
 			table: "zites",
 			where: "category_slug='" + categorySlug + "'" + languageWhere,
 			join: "LEFT JOIN json USING (json_id)",
+			afterOrderBy: "date_added ASC",
 			page: pageNum,
 			limit: limit
 		});
@@ -356,6 +358,7 @@ class ZeroApp extends ZeroFrame {
 			table: "zites",
 			where: "directory='users/" + app.userInfo.auth_address + "'",
 			join: "LEFT JOIN json USING (json_id)",
+			afterOrderBy: "date_added ASC",
 			page: pageNum,
 			limit: limit
 		});
@@ -385,6 +388,7 @@ class ZeroApp extends ZeroFrame {
 			table: "zites",
 			where: app.userInfo && app.userInfo.auth_address ? "bookmarkCount >= 1" : "",
 			join: "LEFT JOIN json USING (json_id)",
+			afterOrderBy: "date_added ASC",
 			page: pageNum,
 			limit: limit
 		});

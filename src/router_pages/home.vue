@@ -26,16 +26,8 @@
 					<li v-for="category in categories"><a :href="'./?/category/' + category.slug">{{ category.name }}</a></li>
 				</ul>
 
-				<!--<ul class="pagination center-align" v-if="zites.length >= 4">
-					<li><a href="#!" v-on:click.prevent="previousPage"><i class="material-icons">chevron_left</i></a></li>
-					<li class="disabled"><a href="#!">{{ pageNum + 1 }}</a></li>
-					<li><a href="#!" v-on:click.prevent="nextPage"><i class="material-icons">chevron_right</i></a></li>
-				</ul>-->
-
 				<component :is="zite_list_item" :user-info="userInfo" v-for="zite in zites" :zite="zite" :show-category="true" :categories="categories" v-on:update="getZites()"></component>
 
-
-				<!-- TODO: Use getSearchResults when check for length once search has been implemented -->
 				<ul class="pagination center-align" v-if="zites.length != 0">
 					<li><a href="#!" v-on:click.prevent="previousPage"><i class="material-icons">chevron_left</i></a></li>
 					<li class="disabled"><a href="#!">{{ pageNum + 1 }}</a></li>
