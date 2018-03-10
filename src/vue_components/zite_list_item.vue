@@ -2,7 +2,7 @@
 	<div class="card" id="zite-list-item" style="margin-bottom: .8rem;">
 		<div class="card-content">
 			<span class="card-title" style="margin-bottom: 0;">
-				<a :href="'/' + (zite.domain || zite.address)">{{ zite.title }}</a>
+				<a :href="'/' + (zite.domain || zite.address)">{{ (zite.merger_category && !zite.merger_supported ? zite.merger_category + ": " : "") + zite.title }}</a>
 			</span>
 			<div> <!-- limit text amount in some way, truncate? -->
 				<span v-if="isNSFW" style="color: red; margin-right: 5px;">NSFW </span>{{ zite.description }}
