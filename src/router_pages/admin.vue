@@ -20,7 +20,7 @@
 					<li><a href="#!" v-on:click.prevent="nextPage"><i class="material-icons">chevron_right</i></a></li>
 				</ul>-->
 
-				<component :is="zite_list_item" :user-info="userInfo" v-for="zite in zites" :zite="zite" :show-category="true" :categories="categories" v-on:update="getZites()"></component>
+				<component :is="zite_list_item" :user-info="userInfo" v-for="zite in zites" :zite="zite" :show-category="true" :categories="categories" v-on:update="getZites()" :lang-translation="langTranslation"></component>
 
 
 				<!-- TODO: Use getSearchResults when check for length once search has been implemented -->
@@ -31,7 +31,7 @@
 				</ul>
 	        </div>
 	        <div class="col s12 m12 l3">
-	        	<component :is="categoriesSidebar" :categories="categories"></component>
+	        	<!--<component :is="categoriesSidebar" :categories="categories"></component>-->
 	        </div>
 	    </div>
 	</div>
@@ -43,7 +43,7 @@
 	var ziteListItem = require("../vue_components/zite_list_item.vue");
 
 	module.exports = {
-		props: ["userInfo"],
+		props: ["userInfo", "langTranslation"],
 		name: "Admin",
 		data: () => {
 			return {
