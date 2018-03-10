@@ -274,6 +274,33 @@ class ZeroApp extends ZeroFrame {
 			`;
 		return s;
 	}
+	
+	getAdminZitesSearch(searchQuery, pageNum = 0, limit = 8) {
+		var languageWhere = "";
+		var query = searchDbQuery(this, searchQuery, {
+			orderByScore: true,
+			id_col: "id",
+			select: "*",
+			searchSelects: [
+				{ col: "title", score: 5 },
+				{ col: "domain", score: 5 },
+				{ col: "address", score: 5 },
+				{ col: "tags", score: 4 },
+				{ col: "category_slug", score: 4 },
+				{ col: "merger_category", score: 4 },
+				{ col: "creator", score: 3 },
+				{ col: "description", score: 2 },
+				{ skip: !app.userInfo || !app.userInfo.auth_address, col: "bookmarkCount", select: this.subQueryBookmarks(), inSearchMatchesAdded: false, inSearchMatchesOrderBy: true, score: 6 } // TODO: Rename inSearchMatchesAdded, and isSearchMatchesOrderBy
+			],
+			table: "zites",
+			join: "LEFT JOIN json USING (json_id)",
+			where: languageWhere,
+			page: pageNum,
+			afterOrderBy: "date_added ASC",
+			limit: limit
+		});
+		return this.cmdp("dbQuery", [query]);
+	}
 
 	// TODO: Username/id at multiplication of 1
 	getZitesSearch(searchQuery, pageNum = 0, limit = 8) {

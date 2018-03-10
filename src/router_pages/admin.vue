@@ -84,7 +84,7 @@
 			},
 			getZites: function() {
 				var self = this;
-				page.getZitesSearch(this.searchQuery, this.pageNum)
+				page.getAdminZitesSearch(this.searchQuery, this.pageNum)
 					.then((zites) => {
 						if (zites.length == 0 && self.pageNum != 0) {
 							self.pageNum--;
