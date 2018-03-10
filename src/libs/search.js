@@ -46,7 +46,7 @@ function searchDbQuery(zeroframe, searchQuery, options) {
     if (options.limit && options.limit != 0)
         offset = (options.page || 0) * options.limit;
     var searchWords = searchQuery.split(" ").map((s) => {
-        return s.replace(/'/g, "''").replace(/%/g, "[%]");
+        return s.replace(/'/g, "''").replace(/%/g, "[%]");//.toLowerCase();
     }).filter((s) => {
         return s != "";
     });

@@ -43,6 +43,13 @@
 				mergerZites: []
 			};
 		},
+		beforeMount: function() {
+			var self = this;
+			this.$parent.$on("resultsChanged", function() {
+				self.showMergerZites = false;
+				self.mergerZites = [];
+			});
+		},
 		computed: {
 			getName: function() {
 				if (!this.zite.cert_user_id) return "";

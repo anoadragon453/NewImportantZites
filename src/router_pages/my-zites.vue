@@ -83,6 +83,7 @@
 							return;
 						}
 						self.zites = zites;
+						self.$emit("resultsChanged");
 					});
 			},
 			previousPage: function() { // TODO: Scroll to top
