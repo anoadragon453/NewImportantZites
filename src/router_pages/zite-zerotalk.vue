@@ -88,7 +88,8 @@
                 clones: [
                     { name: "ZeroTalk", address: "1TaLkFrMwvbNsooF4ioKAY9EuxTBTjipT" },
                     { name: "ZeroDevTalk", address: "142jqssVAj2iRxMACJg2dzipB5oicZYz5w" },
-                    { name: "ZeroTalk Україна", address: "193psz3yGj7EH39nyKb4A2KKBXEHT49Csf" }
+                    { name: "ZeroTalk Україна", address: "193psz3yGj7EH39nyKb4A2KKBXEHT49Csf" },
+                    { name: "Ru-ZeroTalk", address: "1Apr5ba6u9Nz6eFASmFrefGvyBKkM76QgE" }
                 ],
                 address: "1TaLkFrMwvbNsooF4ioKAY9EuxTBTjipT",
                 dbfile: "zerotalk.db"
