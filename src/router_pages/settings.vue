@@ -14,6 +14,18 @@
                                 </select>
                                 <label for="categoryselect">{{ langTranslation["Language(s)"] }} *</label>
                             </div>
+							<p>
+								<label>
+									<input type="checkbox" v-model="ko_interface" :value="ko_interface" />
+									<span>Korean Interface</span>
+								</label>
+							</p>
+							<p>
+								<label>
+									<input type="checkbox" v-model="cs_interface" :value="cs_interface" />
+									<span>Czech Interface</span>
+								</label>
+							</p>
 							<br>
 			        		<button type="submit" class="btn waves-effect waves-light" :class="{ 'disabled': submitBtnDisabled }">{{ langTranslation["Submit"] }}</button>
 			        	</form>
@@ -37,7 +49,9 @@
 			return {
                 ziteLanguages: ziteLanguages,
                 languageSelect_instance: null,
-                languages: []
+				languages: [],
+				ko_interface: false,
+				cs_interface: false
 			}
 		},
 		mounted: function() {
@@ -60,12 +74,14 @@
                 var languageSelect = this.$refs.languageselect;
                 this.languageSelect_instance = M.FormSelect.init(languageSelect, {});
                 if (userInfo.keyvalue.languages) {
-                    this.languages = userInfo.keyvalue.languages.trim().split(",");
+					this.languages = userInfo.keyvalue.languages.trim().split(",");
+					this.ko_interface = userInfo.keyvalue.ko_interface;
+					this.cs_interface = userInfo.keyvalue.cs_interface;
                     this.languageSelect_instance.input.value = userInfo.keyvalue.languages.trim().split(",");
                 }
             },
             updateSettings: function() {
-                page.setLanguages(this.languages.join(","), () => {
+                page.setSettings(this.languages.join(","), this.ko_interface, this.cs_interface, () => {
                     Router.refresh();
                 });
             }

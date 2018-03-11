@@ -8,7 +8,7 @@
         },
         "users/.+/data.json": {
             "to_table": ["zites", "bookmarks"],
-			"to_keyvalue": ["languages"]
+			"to_keyvalue": ["languages", "ko_interface", "cs_interface"]
         },
         "users/.+/content.json": {
             "to_json_table": ["cert_user_id"],

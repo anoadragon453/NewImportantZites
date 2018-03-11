@@ -75,6 +75,26 @@ var app = new Vue({
 					keyvalue: keyvalue
 				};
 
+				if (that.userInfo.keyvalue.ko_interface) {
+					page.cmdp("fileGet", { "inner_path": "languages/ko.json", "required": false }).then((data) => {
+						data = JSON.parse(data);
+						console.log("langdata: ", data);
+						if (data) {
+							app.langTranslation = data;
+							app.$emit("setLanguage", data);
+						}
+					});
+				} else if (that.userInfo.keyvalue.cs_interface) {
+					page.cmdp("fileGet", { "inner_path": "languages/cs.json", "required": false }).then((data) => {
+						data = JSON.parse(data);
+						console.log("langdata: ", data);
+						if (data) {
+							app.langTranslation = data;
+							app.$emit("setLanguage", data);
+						}
+					});
+				}
+
 				console.log("Keyvalue: ", that.userInfo.keyvalue);
 
 				that.$emit("setUserInfo", that.userInfo); // TODO: Not sure if I need this if I can pass in a function callback instead
@@ -140,7 +160,7 @@ class ZeroApp extends ZeroFrame {
         return page.cmdp("wrapperNotification", ["info", "Unimplemented!"]);
 	}
 
-	setLanguages(languages, beforePublishCB) {
+	setSettings(languages, ko_interface, cs_interface, beforePublishCB) {
 		if (!this.siteInfo.cert_user_id) {
     		return this.cmdp("wrapperNotification", ["error", "You must be logged in to set language settings."]);
     	}
@@ -157,6 +177,8 @@ class ZeroApp extends ZeroFrame {
 				}
 				
 				data["languages"] = languages.replace(/\s/g, "");
+				data["ko_interface"] = ko_interface;
+				data["cs_interface"] = cs_interface;
 
     			var json_raw = unescape(encodeURIComponent(JSON.stringify(data, undefined, '\t')));
 
