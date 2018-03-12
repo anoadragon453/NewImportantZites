@@ -10,11 +10,11 @@ var anime = require("animejs");
 window.anime = anime;
 var Materialize = require("materialize-css/dist/js/materialize.min.js");
 
-var MarkdownIt = require("markdown-it");
+/*var MarkdownIt = require("markdown-it");
 md = new MarkdownIt({
 	html: false,
 	linkify: true
-});
+});*/
 
 var ZeroFrame = require("./libs/ZeroFrame.js");
 var Router = require("./libs/router.js");
@@ -24,7 +24,7 @@ var Vue = require("vue/dist/vue.min.js");
 
 var VueZeroFrameRouter = require("./libs/vue-zeroframe-router.js");
 
-var { sanitizeStringForUrl, sanitizeStringForUrl_SQL, html_substr, sanitizeHtmlForDb } = require("./util.js");
+//var { sanitizeStringForUrl, sanitizeStringForUrl_SQL, html_substr, sanitizeHtmlForDb } = require("./util.js");
 
 Vue.use(VueZeroFrameRouter.VueZeroFrameRouter);
 
@@ -131,9 +131,7 @@ class ZeroApp extends ZeroFrame {
 				console.log(siteInfo);
 				self.siteInfo = siteInfo;
 				app.siteInfo = siteInfo;
-				if (siteInfo.address != "1MiS3ud9JogSQpd1QVmM6ETHRmk5RgJn6E") {
-					self.cmdp("wrapperNotification", ["warning", "Note: This is a clone. This greatly reduces the<br>\n visibility of your zite if you only add it here. You<br>\ncan find the original zite at this address:<br>\n 1MiS3ud9JogSQpd1QVmM6ETHRmk5RgJn6E."]);
-				}
+				if (siteInfo.address!="1MiS3ud9JogSQpd1QVmM6ETHRmk5RgJn6E"){self.cmdp("wrapperNotification", ["warning", "Note: This is a clone. This greatly reduces the<br>\n visibility of your zite if you only add it here. You<br>\ncan find the original zite at this address:<br>\n 1MiS3ud9JogSQpd1QVmM6ETHRmk5RgJn6E."]);}
 				app.getUserInfo();
 			});
 	}
