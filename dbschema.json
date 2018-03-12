@@ -7,7 +7,7 @@
             "to_table": ["categories"]
         },
         "users/.+/data.json": {
-            "to_table": ["zites", "bookmarks"],
+            "to_table": ["zites", "bookmarks", "bookmark_categories"],
 			"to_keyvalue": ["languages", "ko_interface", "cs_interface"]
         },
         "users/.+/content.json": {
@@ -63,11 +63,22 @@
                 ["id", "INTEGER"],
                 ["reference_id", "INTEGER"],
                 ["reference_auth_address", "TEXT"],
+                ["category_id", "INTEGER"],
                 ["date_added", "INTEGER"],
                 ["json_id", "INTEGER REFERENCES json (json_id)"]
             ],
             "indexes": ["CREATE UNIQUE INDEX bookmarks_key ON bookmarks (json_id, id)", "CREATE INDEX bookmarks_idx ON bookmarks (reference_id, reference_auth_address)", "CREATE INDEX bookmarks_date_added_idx ON bookmarks (date_added DESC)"],
-            "schema_changed": 4
+            "schema_changed": 5
+        },
+        "bookmark_categories": {
+            "cols": [
+                ["id", "INTEGER"],
+                ["name", "TEXT"],
+                ["date_added", "INTEGER"],
+                ["json_id", "INTEGER REFERENCES json (json_id)"]
+            ],
+            "indexes": ["CREATE UNIQUE INDEX bookmark_categories_key ON bookmark_categories (json_id, id)"],
+            "schema_changed": 2
         }
     }
 }

@@ -223,6 +223,19 @@ class ZeroApp extends ZeroFrame {
 		return page.cmdp("dbQuery", [query]);
 	}
 
+	getBookmarkCategories() {
+		if (!app.userInfo || !app.userInfo.auth_address) return;
+		
+		
+		var query = `
+			SELECT * FROM bookmark_categories
+			LEFT JOIN json USING (json_id)
+			WHERE directory='users/${app.userInfo.auth_address}'
+			`;
+		//console.log(query);
+		return page.cmdp("dbQuery", [query]);
+	}
+
 	getZite(auth_address, id) {
 		var query = `
 			SELECT *
@@ -277,22 +290,27 @@ class ZeroApp extends ZeroFrame {
 		const offset = pageNum * limit;
 		var query = `
 			SELECT *
-				${app.userInfo && app.userInfo.auth_address ? ", " + this.subQueryBookmarks() : ""}
+				${app.userInfo && app.userInfo.auth_address ? ", (" + this.subQueryBookmarks() + ") AS bookmarkCount" : ""}
 			FROM zites
-				${app.userInfo && app.userInfo.auth_address ? "WHERE bookmarkCount >= 1" : ""}
 			LEFT JOIN json USING (json_id)
-			LIMIT ${limit}
-			OFFSET ${offset}
+				${app.userInfo && app.userInfo.auth_address ? "WHERE bookmarkCount >= 1" : ""}
+			${limit ? "LIMIT " + limit : ""}
+			${limit ? "OFFSET " + offset : ""}
 			`;
+		console.log(query);
 		return page.cmdp("dbQuery", [query]);
 	}
 
-	subQueryBookmarks() {
+	subQueryBookmarks(bookmarkCategoryId) {
 		if (!app.userInfo || !app.userInfo.auth_address) {
 			return "";
 		}
+		var categoryWhere = "";
+		if (bookmarkCategoryId && bookmarkCategoryId != "All" && bookmarkCategoryId != "MyZites") {
+			categoryWhere = " AND bookmarks.category_id=" + bookmarkCategoryId;
+		}
 		var s = `
-			SELECT DISTINCT COUNT(*) FROM bookmarks LEFT JOIN json AS bookmarksjson USING (json_id) WHERE zites.id=bookmarks.reference_id AND bookmarksjson.directory='users/${app.userInfo.auth_address}'
+			SELECT DISTINCT COUNT(*) FROM bookmarks LEFT JOIN json AS bookmarksjson USING (json_id) WHERE zites.id=bookmarks.reference_id AND bookmarksjson.directory='users/${app.userInfo.auth_address}' ${categoryWhere}
 			`;
 		return s;
 	}
@@ -432,9 +450,18 @@ class ZeroApp extends ZeroFrame {
 		return this.cmdp("dbQuery", [query]);
 	}
 
-	getBookmarkZitesSearch(searchQuery, pageNum = 0, limit = 8) {
+	// bookmarkCategoryId -
+	//  "All" for All bookmarks
+	//  "MyZites" for My Zites that are bookmarked
+	//  or Id of bookmark category
+	getBookmarkZitesSearch(bookmarkCategoryId, searchQuery, pageNum = 0, limit = 8) {
 		if (!this.siteInfo.cert_user_id) {
     		return this.cmdp("wrapperNotification", ["error", "You must be logged in to see your bookmarks."]);
+		}
+
+		var myZitesCategoryWhere = "";
+		if (app.userInfo && app.userInfo.auth_address && bookmarkCategoryId === "MyZites") {
+			myZitesCategoryWhere = " AND directory='users/" + app.userInfo.auth_address + "'";
 		}
 		
 		var query = searchDbQuery(this, searchQuery, {
@@ -450,10 +477,10 @@ class ZeroApp extends ZeroFrame {
 				{ col: "merger_category", score: 4 },
 				{ col: "creator", score: 3 },
 				{ col: "description", score: 2 },
-				{ skip: !app.userInfo || !app.userInfo.auth_address, col: "bookmarkCount", select: this.subQueryBookmarks(), inSearchMatchesAdded: false, inSearchMatchesOrderBy: false, score: 6 } // TODO: Rename inSearchMatchesAdded, and isSearchMatchesOrderBy
+				{ skip: !app.userInfo || !app.userInfo.auth_address, col: "bookmarkCount", select: this.subQueryBookmarks(bookmarkCategoryId), inSearchMatchesAdded: false, inSearchMatchesOrderBy: false, score: 6 } // TODO: Rename inSearchMatchesAdded, and isSearchMatchesOrderBy
 			],
 			table: "zites",
-			where: app.userInfo && app.userInfo.auth_address ? "bookmarkCount >= 1" : "",
+			where: (app.userInfo && app.userInfo.auth_address ? "bookmarkCount >= 1" : "") + myZitesCategoryWhere,
 			join: "LEFT JOIN json USING (json_id)",
 			afterOrderBy: "date_added ASC",
 			page: pageNum,
@@ -903,6 +930,114 @@ class ZeroApp extends ZeroFrame {
 								keepLooping = false;
 							}
 						}
+					}
+				}
+
+    			var json_raw = unescape(encodeURIComponent(JSON.stringify(data, undefined, '\t')));
+
+    			return self.cmdp("fileWrite", [data_inner_path, btoa(json_raw)])
+					.then((res) => {
+		    			if (res === "ok") {
+		    				return self.cmdp("siteSign", { "inner_path": content_inner_path })
+		    					.then((res) => {
+		    						if (res === "ok") {
+		    							if (beforePublishCB != null && typeof beforePublishCB === "function") beforePublishCB({ "id": date, "auth_address": self.siteInfo.auth_address });
+		    							return self.cmdp("sitePublish", { "inner_path": content_inner_path, "sign": false })
+		    								.then(() => {
+		    									return { "id": date, "auth_address": self.siteInfo.auth_address };
+		    								}).catch((err) => {
+                                                console.log(err);
+                                                return { "id": date, "auth_address": self.siteInfo.auth_address, "err": err };
+                                            });
+		    						} else {
+		    							return self.cmdp("wrapperNotification", ["error", "Failed to sign user data."]);
+		    						}
+		    					});
+		    			} else {
+		    				return self.cmdp("wrapperNotification", ["error", "Failed to write to data file."]);
+		    			}
+		    		});
+	    	});
+	}
+
+	addBookmarkCategory(name, beforePublishCB) {
+		if (!this.siteInfo.cert_user_id) {
+    		return this.cmdp("wrapperNotification", ["error", "You must be logged in to add a zite."]);
+    	}
+
+    	var data_inner_path = "data/users/" + this.siteInfo.auth_address + "/data.json";
+    	var content_inner_path = "data/users/" + this.siteInfo.auth_address + "/content.json";
+
+    	var self = this;
+    	return this.cmdp("fileGet", { "inner_path": data_inner_path, "required": false })
+    		.then((data) => {
+    			data = JSON.parse(data);
+    			if (!data) {
+    				data = {};
+    			}
+
+    			if (!data["bookmark_categories"]) data["bookmark_categories"] = [];
+
+				var date = Date.now();
+				
+    			data["bookmark_categories"].push({
+    				"id": date,
+					"name": name.trim(),
+    				"date_added": date
+    			});
+
+    			var json_raw = unescape(encodeURIComponent(JSON.stringify(data, undefined, '\t')));
+
+    			return self.cmdp("fileWrite", [data_inner_path, btoa(json_raw)])
+					.then((res) => {
+		    			if (res === "ok") {
+		    				return self.cmdp("siteSign", { "inner_path": content_inner_path })
+		    					.then((res) => {
+		    						if (res === "ok") {
+		    							if (beforePublishCB != null && typeof beforePublishCB === "function") beforePublishCB({ "id": date, "auth_address": self.siteInfo.auth_address });
+		    							return self.cmdp("sitePublish", { "inner_path": content_inner_path, "sign": false })
+		    								.then(() => {
+		    									return { "id": date, "auth_address": self.siteInfo.auth_address };
+		    								}).catch((err) => {
+                                                console.log(err);
+                                                return { "id": date, "auth_address": self.siteInfo.auth_address, "err": err };
+                                            });
+		    						} else {
+		    							return self.cmdp("wrapperNotification", ["error", "Failed to sign user data."]);
+		    						}
+		    					});
+		    			} else {
+		    				return self.cmdp("wrapperNotification", ["error", "Failed to write to data file."]);
+		    			}
+		    		});
+	    	});
+	}
+
+	setBookmarkCategory(reference_id, reference_auth_address, categoryId, beforePublishCB) {
+		if (!this.siteInfo.cert_user_id) {
+    		return this.cmdp("wrapperNotification", ["error", "You must be logged in to add a zite."]);
+    	}
+
+    	var data_inner_path = "data/users/" + this.siteInfo.auth_address + "/data.json";
+    	var content_inner_path = "data/users/" + this.siteInfo.auth_address + "/content.json";
+
+    	var self = this;
+    	return this.cmdp("fileGet", { "inner_path": data_inner_path, "required": false })
+    		.then((data) => {
+    			data = JSON.parse(data);
+    			if (!data) {
+    				data = {};
+    			}
+
+				var date = null;
+
+    			if (!data["bookmarks"]) return;
+
+				for (var i = 0; i < data["bookmarks"].length; i++) {
+					if (data["bookmarks"][i].reference_id == reference_id && data["bookmarks"][i].reference_auth_address == reference_auth_address) {
+						data["bookmarks"][i]["category_id"] = categoryId;
+						date = data["bookmarks"][i].date_added;
+						break;
 					}
 				}
 
