@@ -1,6 +1,6 @@
 version = "0.1";
 ziteLanguages = [
-	"DA", "DE", "EN", "ES", "EO", "FR", "HU", "IT", "NL", "PL", "PT", "PT-BR", "RU", "TR", "UK", "ZH", "ZH-TW"
+	"CS", "DA", "DE", "EN", "ES", "EO", "FR", "HU", "IT", "KO", "NL", "PL", "PT", "PT-BR", "RU", "TR", "UK", "ZH", "ZH-TW"
 ];
 
 var defaultLang = require("./default-lang.js");
