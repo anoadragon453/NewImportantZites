@@ -44,7 +44,8 @@ gulp.task("scripts", function() {
         entries: ["src/main.js"],
         cache: {},
         packageCache: {},
-        insertGlobals: true
+        insertGlobals: true,
+        //fullPaths: true
     })
     .transform(vueify)
     .transform('uglifyify', { global: true })

@@ -131,7 +131,7 @@ class ZeroApp extends ZeroFrame {
 				console.log(siteInfo);
 				self.siteInfo = siteInfo;
 				app.siteInfo = siteInfo;
-				if (siteInfo.address!="1MiS3ud9JogSQpd1QVmM6ETHRmk5RgJn6E"){self.cmdp("wrapperNotification", ["warning", "Note: This is a clone. This greatly reduces the<br>\n visibility of your zite if you only add it here. You<br>\ncan find the original zite at this address:<br>\n 1MiS3ud9JogSQpd1QVmM6ETHRmk5RgJn6E."]);}
+				if (siteInfo.address!="1MiS3ud9JogSQpd1QVmM6ETHRmk5RgJn6E" && !siteInfo.settings.own){self.cmdp("wrapperNotification", ["warning", "Note: This is a clone. This greatly reduces the<br>\n visibility of your zite if you only add it here. You<br>\ncan find the original zite at this address:<br>\n 1MiS3ud9JogSQpd1QVmM6ETHRmk5RgJn6E."]);}
 				app.getUserInfo();
 			});
 	}
