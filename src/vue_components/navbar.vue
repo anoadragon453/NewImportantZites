@@ -11,7 +11,7 @@
 			</li>
 			<li><a href="#" v-on:click.prevent="login()">{{ langTranslation["Switch User"] }}</a></li>
 			<li class="divider"></li>
-			<li><a href="./?/admin" v-on:click.prevent="goto('admin')" v-if="userInfo && userInfo.privatekey">Admin</a></li>
+			<li v-if="userInfo && userInfo.privatekey"><a href="./?/admin" v-on:click.prevent="goto('admin')">Admin</a></li>
 		</ul>
 		<nav id="navbar" class="green darken-4">
 			<div class="nav-wrapper">
