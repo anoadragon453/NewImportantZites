@@ -38,7 +38,7 @@
 						<li v-for="link in navbarLinksRight">
 							<a :href="'./?/' + link.route" v-on:click.prevent="navbarLinkClick(link)">{{ link.name }}</a>
 						</li>
-						<li v-for="link in userLinks">
+						<li v-for="link in userLinks" v-if="isLoggedIn">
 							<a :href="'./?/' + link.route" v-on:click.prevent="navbarLinkClick(link)">{{ link.name }}</a>
 						</li>
 						<li v-if="!isLoggedIn"><a v-on:click.prevent="login()">{{ langTranslation["Login"] }}</a></li>
@@ -49,13 +49,12 @@
 						<li v-if="userInfo && userInfo.privatekey">
 							<a href="./?/admin" v-on:click.prevent="goto('admin')" v-if="userInfo && userInfo.privatekey">Admin</a>
 						</li>
-						<li class="divider">
-							<li><a class="collection-item" :class="{ 'active': false }" :href="'./?/zite/zeroup'" v-on:click.prevent="goto('zite/zeroup');">ZeroUp</a></li>
-							<li><a class="collection-item" :class="{ 'active': false }" :href="'./?/zite/zerosites'" v-on:click.prevent="goto('zite/zerosites');">ZeroSites</a></li>
-							<li><a class="collection-item" :class="{ 'active': false }" :href="'./?/zite/zerolist'" v-on:click.prevent="goto('zite/zerolist');">0List</a></li>
-							<li><a class="collection-item" :class="{ 'active': false }" :href="'./?/zite/zerotalk'" v-on:click.prevent="goto('zite/zerotalk');">ZeroTalk</a></li>
-							<li><a class="collection-item" :class="{ 'active': false }" :href="'./?/zite/kiwipedia'" v-on:click.prevent="goto('zite/kiwipedia');">Kiwipedia</a></li>
-						</li>
+						<li class="divider"></li>
+						<li><a class="collection-item" :class="{ 'active': false }" :href="'./?/zite/zeroup'" v-on:click.prevent="goto('zite/zeroup');">ZeroUp</a></li>
+						<li><a class="collection-item" :class="{ 'active': false }" :href="'./?/zite/zerosites'" v-on:click.prevent="goto('zite/zerosites');">ZeroSites</a></li>
+						<li><a class="collection-item" :class="{ 'active': false }" :href="'./?/zite/zerolist'" v-on:click.prevent="goto('zite/zerolist');">0List</a></li>
+						<li><a class="collection-item" :class="{ 'active': false }" :href="'./?/zite/zerotalk'" v-on:click.prevent="goto('zite/zerotalk');">ZeroTalk</a></li>
+						<li><a class="collection-item" :class="{ 'active': false }" :href="'./?/zite/kiwipedia'" v-on:click.prevent="goto('zite/kiwipedia');">Kiwipedia</a></li>
 					</ul>
 				</div>
 			</div>
