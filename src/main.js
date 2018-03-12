@@ -368,15 +368,21 @@ class ZeroApp extends ZeroFrame {
 			languageWhere += " OR languages='' OR languages IS NULL";
 			languageWhere += ")";
 		} else if (app.serverInfo && app.serverInfo.language) {
-			// When not logged in, push up, in the results, the zites that are in the same language as the client
-			//  but still display the zites that aren't in the same language (they'd just be lower in list)
+			// When not logged in, push up, in the results, the zites that are in the same language as the client but still display the zites that aren't in the same language (they'd just be lower in list)
 			searchSelects.push({
 				col: "langCount",
-				select: `SELECT DISTINCT COUNT(*) FROM zites AS langzites LEFT JOIN json AS langjson USING (json_id) WHERE zites.id=langzites.id AND (langzites.languages IS NULL OR langzites.languages='' OR langzites.languages LIKE '${app.serverInfo.language.toUpperCase()}' OR langzites.languages LIKE '${app.serverInfo.language.toUpperCase()},%' OR langzites.languages LIKE '%,${app.serverInfo.language.toUpperCase()}' OR langzites.languages LIKE '%,${app.serverInfo.language.toUpperCase()},%')`,
+				select: `SELECT DISTINCT COUNT(*) FROM zites AS langzites LEFT JOIN json AS langjson USING (json_id) WHERE zites.id=langzites.id AND (langzites.languages LIKE '${app.serverInfo.language.toUpperCase()}' OR langzites.languages LIKE '${app.serverInfo.language.toUpperCase()},%' OR langzites.languages LIKE '%,${app.serverInfo.language.toUpperCase()}' OR langzites.languages LIKE '%,${app.serverInfo.language.toUpperCase()},%')`,
 				isSearchMatchesAdded: false,
 				isSearchMatchesOrderBy: true,
-				score: 2
+				score: 1
 			});
+			searchSelects.push({
+				col: "langCount2",
+				select: `SELECT DISTINCT COUNT(*) FROM zites AS langzites LEFT JOIN json AS langjson USING (json_id) WHERE zites.id=langzites.id AND (langzites.languages LIKE '${app.serverInfo.language.toUpperCase()}')`,
+				isSearchMatchesAdded: false,
+				isSearchMatchesOrderBy: true,
+				score: 1
+			})
 		}
 		var query = searchDbQuery(this, searchQuery, {
 			orderByScore: true,
