@@ -4,7 +4,7 @@ var vueify = require("vueify");
 var gulp = require("gulp");
 var browserify = require("browserify");
 var source = require("vinyl-source-stream");
-// var uglify = require("gulp-uglify");
+var uglifyify = require("uglifyify");
 // var gutil = require("gulp-util");
 var sourcemaps = require("gulp-sourcemaps");
 var buffer = require("vinyl-buffer");
@@ -47,12 +47,11 @@ gulp.task("scripts", function() {
         insertGlobals: true
     })
     .transform(vueify)
+    .transform('uglifyify', { global: true })
     .bundle()
     .pipe(source("bundle.js"))
-    .pipe(buffer())
-    .pipe(sourcemaps.init({ loadMaps: true }))
-    // .pipe(uglify())
-    .pipe(sourcemaps.write("./"))
+    //.pipe(sourcemaps.init({ loadMaps: true }))
+    //.pipe(sourcemaps.write("./"))
     .pipe(gulp.dest("./js/"));
 });
 
