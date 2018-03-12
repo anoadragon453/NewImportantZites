@@ -31,7 +31,7 @@
 </template>
 
 <script>
-	var moment = require("moment");
+	//var moment = require("moment");
 	var Router = require("../libs/router.js");
 
 	module.exports = {

@@ -92,7 +92,7 @@
 
 <script>
 	var Router = require("../libs/router.js");
-	var M = require("materialize-css");
+	var M = require("materialize-css/dist/js/materialize.min.js");
 
 	module.exports = {
 		props: ["userInfo", "ziteToImport", "langTranslation"],

@@ -50,8 +50,9 @@ gulp.task("scripts", function() {
     .transform('uglifyify', { global: true })
     .bundle()
     .pipe(source("bundle.js"))
-    //.pipe(sourcemaps.init({ loadMaps: true }))
-    //.pipe(sourcemaps.write("./"))
+    .pipe(buffer())
+    .pipe(sourcemaps.init({ loadMaps: true }))
+    .pipe(sourcemaps.write("./"))
     .pipe(gulp.dest("./js/"));
 });
 

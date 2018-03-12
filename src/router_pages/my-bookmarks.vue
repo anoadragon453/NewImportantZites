@@ -72,7 +72,7 @@
 	var Router = require("../libs/router.js");
 	//var categoriesSidebar = require("../vue_components/categories.vue");
 	var ziteListItem = require("../vue_components/zite_list_item.vue");
-	var M = require("materialize-css");
+	var M = require("materialize-css/dist/js/materialize.min.js");
 
 	module.exports = {
 		props: ["userInfo", "langTranslation"],
