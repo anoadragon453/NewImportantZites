@@ -344,6 +344,18 @@ class ZeroApp extends ZeroFrame {
 
 	// TODO: Username/id at multiplication of 1
 	getZitesSearch(searchQuery, pageNum = 0, limit = 8) {
+		var searchSelects = [
+			{ col: "title", score: 5 },
+			{ col: "domain", score: 5 },
+			{ col: "address", score: 5 },
+			{ col: "tags", score: 4 },
+			{ col: "category_slug", score: 4 },
+			{ col: "merger_category", score: 4 },
+			{ col: "creator", score: 3 },
+			{ col: "description", score: 2 },
+			{ skip: !app.userInfo || !app.userInfo.auth_address, col: "bookmarkCount", select: this.subQueryBookmarks(), inSearchMatchesAdded: false, inSearchMatchesOrderBy: true, score: 6 } // TODO: Rename inSearchMatchesAdded, and isSearchMatchesOrderBy
+		];
+
 		var languageWhere = "";
 		if (app.userInfo && app.userInfo.keyvalue && app.userInfo.keyvalue.languages && app.userInfo.keyvalue.language != "") {
 			languageWhere += "(";
@@ -355,22 +367,22 @@ class ZeroApp extends ZeroFrame {
 			}
 			languageWhere += " OR languages='' OR languages IS NULL";
 			languageWhere += ")";
+		} else if (app.serverInfo && app.serverInfo.language) {
+			// When not logged in, push up, in the results, the zites that are in the same language as the client
+			//  but still display the zites that aren't in the same language (they'd just be lower in list)
+			searchSelects.push({
+				col: "langCount",
+				select: `SELECT DISTINCT COUNT(*) FROM zites AS langzites LEFT JOIN json AS langjson USING (json_id) WHERE zites.id=langzites.id AND (langzites.languages IS NULL OR langzites.languages='' OR langzites.languages LIKE '${app.serverInfo.language.toUpperCase()}' OR langzites.languages LIKE '${app.serverInfo.language.toUpperCase()},%' OR langzites.languages LIKE '%,${app.serverInfo.language.toUpperCase()}' OR langzites.languages LIKE '%,${app.serverInfo.language.toUpperCase()},%')`,
+				isSearchMatchesAdded: false,
+				isSearchMatchesOrderBy: true,
+				score: 2
+			});
 		}
 		var query = searchDbQuery(this, searchQuery, {
 			orderByScore: true,
 			id_col: "id",
 			select: "*",
-			searchSelects: [
-				{ col: "title", score: 5 },
-				{ col: "domain", score: 5 },
-				{ col: "address", score: 5 },
-				{ col: "tags", score: 4 },
-				{ col: "category_slug", score: 4 },
-				{ col: "merger_category", score: 4 },
-				{ col: "creator", score: 3 },
-				{ col: "description", score: 2 },
-				{ skip: !app.userInfo || !app.userInfo.auth_address, col: "bookmarkCount", select: this.subQueryBookmarks(), inSearchMatchesAdded: false, inSearchMatchesOrderBy: true, score: 6 } // TODO: Rename inSearchMatchesAdded, and isSearchMatchesOrderBy
-			],
+			searchSelects: searchSelects,
 			table: "zites",
 			join: "LEFT JOIN json USING (json_id)",
 			where: languageWhere,
