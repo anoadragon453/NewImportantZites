@@ -29,7 +29,7 @@
                 <div class="card" v-for="result in results">
                     <div class="card-content">
                         <span class="card-title" style="margin-bottom: 0;">
-                            <a :href="'#'">{{ result.user_name }}</a>
+                            <a :href="getLink(result)">{{ result.user_name }}</a>
                         </span>
                         <div>
                             {{ result.body }}
@@ -94,6 +94,12 @@
 		methods: {
 			goto: function(to) {
 				Router.navigate(to);
+            },
+            getLink: function(result) {
+                console.log(result);
+                var auth_address = result.directory.replace(/data\/users/, "").replace(/\//g, "");
+                console.log(auth_address);
+                return "/" + this.address + "/?Post/" + result.site + "/" + auth_address + "/" + result.post_id;
             },
             /*getDownloadLink: function(result) {
                 return "/1uPLoaDwKzP6MCGoVzw48r4pxawRBdmQc/data/users/"+result.directory+"/"+result.file_name; 
