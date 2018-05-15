@@ -68,8 +68,7 @@
                 searchQuery: "",
 				pageNum: 0,
                 searchQuery: "",
-                address: "186THqMWuptrZxq1rxzpguAivK3Bs6z84o",
-                dbfile: "zerotalk.db"
+                address: "186THqMWuptrZxq1rxzpguAivK3Bs6z84o"
 			}
 		},
 		beforeMount: function() {

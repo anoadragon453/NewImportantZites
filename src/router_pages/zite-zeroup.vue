@@ -29,7 +29,7 @@
                 <div class="card" v-for="result in results">
                     <div class="card-content">
                         <span class="card-title" style="margin-bottom: 0;">
-                            <a :href="getDownloadLink">{{ result.title }}</a>
+                            <a :href="getDownloadLink(result)">{{ result.title }}</a>
                         </span>
                         <div>
                             {{ langTranslation["Uploaded by ..."].replace(/\.\.\./, result.cert_user_id) }} | {{ result.directory.replace(/users\//, "").replace(/\//g, "") }}<br>
@@ -70,8 +70,7 @@
                 searchQuery: "",
 				pageNum: 0,
                 searchQuery: "",
-                address: "1uPLoaDwKzP6MCGoVzw48r4pxawRBdmQc",
-                dbfile: "zeroup.db"
+                address: "1uPLoaDwKzP6MCGoVzw48r4pxawRBdmQc"
 			}
 		},
 		beforeMount: function() {

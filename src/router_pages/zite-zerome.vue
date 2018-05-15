@@ -1,12 +1,12 @@
 <template>
-	<div id="ZiteKiwipedia" class="container">
+	<div id="ZiteZeroMe" class="container">
 		<div class="row">
 	        <div class="col s12 m12 l8 push-l2">
 				<nav style="background-color: #4caf50; margin-bottom: .8rem; margin-top: 8px;">
 					<div class="nav-wrapper">
 					<form onsubmit="return false;">
-						<div class="input-field"> <!-- TODO: Change to "Search ... (On Enter)" -->
-						<input id="search" type="search" :placeholder="langTranslation['Search ...'].replace(/\.\.\./, 'Kiwipedia') + ' (On Enter)'" v-on:keyup.enter="searchEnter" v-model="searchQuery" required>
+						<div class="input-field">
+						<input id="search" type="search" :placeholder="langTranslation['Search ...'].replace(/\.\.\./, 'ZeroMe')" v-on:input.prevent="getResults" v-on:keyup.enter="searchEnter($event)" v-model="searchQuery" required>
 						<label class="label-icon" for="search"><i class="material-icons">search</i></label>
 						<i class="material-icons" v-on:click.prevent="clearSearch()">close</i>
 						</div>
@@ -26,14 +26,19 @@
                     </div>
                 </div>
 
-                <div class="card" v-for="result in results" v-if="result.title != ''">
+                <div class="card" v-for="result in results">
                     <div class="card-content">
                         <span class="card-title" style="margin-bottom: 0;">
-                            <a :href="getLink(result)">{{ result.title }}</a>
+                            <a :href="'#'">{{ result.user_name }}</a>
                         </span>
-                        <small>
-                            Last updated by {{ result.cert_user_id }} | {{ result.directory.replace(/17FjMvAGAWAHxUohzk5HEq5EgjoCXnXV19\/data\/users\//, "").replace(/\//g, "") }} <br>
-                        </small>
+                        <div>
+                            {{ result.body }}
+                        </div>
+                        <div>
+                            <!--{{ langTranslation["Published by ..."].replace(/\.\.\./, result.user_name) }} | {{ result.directory.replace(/users\//, "").replace(/\//g, "") }}<br>-->
+                            {{ langTranslation["Date Uploaded"] }}: {{ getDate(result).toLocaleString() }}
+                        </div>
+                        <!--<small>{{ result.file_name }}</small>-->
                     </div>
                 </div>
 
@@ -44,7 +49,7 @@
 				</ul>
 	        </div>
 	        <div class="col s12 m12 l3">
-	        	<component :is="categoriesSidebar" :categories="categories"></component>
+	        	<!--<component :is="categoriesSidebar" :categories="categories"></component>-->
 	        </div>
 	    </div>
 	</div>
@@ -52,20 +57,23 @@
 
 <script>
 	var Router = require("../libs/router.js");
+	//var categoriesSidebar = require("../vue_components/categories.vue");
+    var ziteListItem = require("../vue_components/zite_list_item.vue");
     var searchDbQuery = require("../libs/search.js");
 
 	module.exports = {
 		props: ["userInfo", "langTranslation"],
-		name: "ZiteKiwipedia",
+		name: "ZiteZeroMe",
 		data: () => {
 			return {
+                //categoriesSidebar: categoriesSidebar,
                 loading: true,
                 prevResults: [],
                 results: [],
                 searchQuery: "",
 				pageNum: 0,
                 searchQuery: "",
-                address: "1KiwiBCVBUcuypVm8FEmUW9YT6fJDXkN9r"
+                address: "1MeFqFfFFGQfa1J3gJyYYUvb5Lksczq7nH"
 			}
 		},
 		beforeMount: function() {
@@ -87,8 +95,17 @@
 			goto: function(to) {
 				Router.navigate(to);
             },
-            getLink: function(result) {
-                return "/" + this.address + "/?/wiki/en/" + result.slug;
+            /*getDownloadLink: function(result) {
+                return "/1uPLoaDwKzP6MCGoVzw48r4pxawRBdmQc/data/users/"+result.directory+"/"+result.file_name; 
+            },
+            getFilesize: function(result) {
+                return (result.size/1024/1024).toFixed(2);
+            },
+            getFiledate: function(result) {
+                return new Date(result.date_added*1000);
+            },*/
+            getDate: function(result) {
+                return new Date(result.date_added * 1000);
             },
             getCorsAndDb: function() {
                 var self = this;
@@ -106,23 +123,20 @@
 
                 var query = searchDbQuery(page, self.searchQuery, {
                     orderByScore: true,
-                    id_col: "slug",
-                    select: "article.title, article.text, article.slug, MAX(article.date_updated) AS date_updated, article.imported, article.json_id, json.cert_user_id, json.directory",
+                    id_col: "post_id",
+                    select: "*",
                     searchSelects: [
-                        { col: "title", score: 5 },
-                        { col: "cert_user_id", score: 4, usingJson: true },
-                        //{ col: "slug", score: 4 },
-                        { col: "text", score: 3 },
+                        { col: "body", score: 5 },
+                        { col: "cert_user_id", score: 3, usingJson: true },
+                        { col: "user_name", score: 3, usingJson: true },
                         //{ col: "directory", score: 2, usingJson: true },
-                        //{ col: "date_updated", score: 1 }
+                        //{ col: "date_added", score: 1 }
                     ],
-                    table: "article",
+                    table: "post",
                     join: "LEFT JOIN json USING (json_id)",
-                    where: "json.site = 'merged-Kiwipedia' AND json.directory LIKE '17FjMvAGAWAHxUohzk5HEq5EgjoCXnXV19/%'", // Only support En hub
                     page: self.pageNum,
-                    //afterOrderBy: "date_updated DESC",
-                    groupBy: "article.slug",
-                    limit: 8
+                    afterOrderBy: "date_added DESC",
+                    limit: 12
                 });
 
                 page.cmd("as", [self.address, "dbQuery", [query]], function(results) {
@@ -149,7 +163,7 @@
 				this.getResults();
 			},
 			nextPage: function() {
-				this.pageNum += 1;
+                this.pageNum += 1;
                 this.prevResults = this.results;
                 this.results = [];
                 this.loading = true;
@@ -164,11 +178,7 @@
 				this.getResults();
 			},
 			searchEnter: function(e) {
-                this.prevResults = this.results;
-                this.results = [];
-                this.loading = true;
-                this.pageNum = 0;
-                this.getResults();
+				page.cmd("wrapperOpenWindow", ["/" + this.zites[0].address]);
 			}
 		}
 	}

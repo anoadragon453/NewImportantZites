@@ -92,8 +92,7 @@
                     { name: "Ru-ZeroTalk", address: "1Apr5ba6u9Nz6eFASmFrefGvyBKkM76QgE" },
                     { name: "ZeroTalk En Español", address: "165eqHdoQfyf7CVGqtVCGNDvMBZhwVSJBL" }
                 ],
-                address: "1TaLkFrMwvbNsooF4ioKAY9EuxTBTjipT",
-                dbfile: "zerotalk.db"
+                address: "1TaLkFrMwvbNsooF4ioKAY9EuxTBTjipT"
 			}
 		},
 		beforeMount: function() {

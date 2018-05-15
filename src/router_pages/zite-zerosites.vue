@@ -69,8 +69,7 @@
                 searchQuery: "",
 				pageNum: 0,
                 searchQuery: "",
-                address: "1SiTEs2D3rCBxeMoLHXei2UYqFcxctdwB",
-                dbfile: "zerosites.db"
+                address: "1SiTEs2D3rCBxeMoLHXei2UYqFcxctdwB"
 			}
 		},
 		beforeMount: function() {
