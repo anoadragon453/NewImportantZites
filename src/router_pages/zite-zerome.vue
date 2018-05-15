@@ -96,9 +96,7 @@
 				Router.navigate(to);
             },
             getLink: function(result) {
-                console.log(result);
                 var auth_address = result.directory.replace(/data\/users/, "").replace(/\//g, "");
-                console.log(auth_address);
                 return "/" + this.address + "/?Post/" + result.site + "/" + auth_address + "/" + result.post_id;
             },
             /*getDownloadLink: function(result) {
@@ -154,6 +152,7 @@
                     }
                     self.results = results;
                     //console.log(results);
+                    //console.log(auth_address);
                     self.loading = false;
                 });
             },
