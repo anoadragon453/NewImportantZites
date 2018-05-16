@@ -59,7 +59,8 @@
 						<li><a class="collection-item" :class="{ 'active': false }" :href="'./?/zite/zerolist'" v-on:click.prevent="goto('zite/zerolist');">0List</a></li>
 						<li><a class="collection-item" :class="{ 'active': false }" :href="'./?/zite/zerotalk'" v-on:click.prevent="goto('zite/zerotalk');">ZeroTalk</a></li>
 						<li><a class="collection-item" :class="{ 'active': false }" :href="'./?/zite/kiwipedia'" v-on:click.prevent="goto('zite/kiwipedia');">Kiwipedia</a></li>
-						<li><a class="collection-item" :class="{ 'active': false }" :href="'./?/zite/zerome'" v-on:click.prevent="goto('zite/zerome');">ZeroMe</a></li>
+						<li style="margin-bottom: 10px;"><a class="collection-item" :class="{ 'active': false }" :href="'./?/zite/zerome'" v-on:click.prevent="goto('zite/zerome');">ZeroMe</a></li>
+						<li><a class="collection-item"></a></li>
 					</ul>
 				</div>
 			</div>
