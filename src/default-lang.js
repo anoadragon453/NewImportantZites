@@ -57,7 +57,9 @@ var defaultLang = {
     "Created by ...": "Created by ...",
     "Update": "Update",
     "Submitted by ...": "Submitted by ...",
-    "There are no merger zites yet!": "There are no merger zites yet!"
+    "There are no merger zites yet!": "There are no merger zites yet!",
+    "Name": "Name",
+    "Total Search": "Total Search"
 };
 
 module.exports = defaultLang;

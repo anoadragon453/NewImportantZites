@@ -1098,6 +1098,9 @@ var ImportZite = require("./router_pages/import-zite.vue");
 var MyZites = require("./router_pages/my-zites.vue");
 var MyBookmarks = require("./router_pages/my-bookmarks.vue");
 var CategoryPage = require("./router_pages/categoryPage.vue");
+
+var TotalSearch = require("./router_pages/totalSearch.vue");
+
 var ZiteZeroUp = require("./router_pages/zite-zeroup.vue");
 var ZiteZeroSites = require("./router_pages/zite-zerosites.vue");
 var ZiteZeroList = require("./router_pages/zite-0list.vue");
@@ -1119,6 +1122,7 @@ VueZeroFrameRouter.VueZeroFrameRouter_Init(Router, app, [
 	{ route: "zite/zerotalk", component: ZiteZeroTalk },
 	{ route: "zite/kiwipedia", component: ZiteKiwipedia },
 	{ route: "zite/zerome", component: ZiteZeroMe },
+	{ route: "total-search", component: TotalSearch },
 	{ route: "my-bookmarks", component: MyBookmarks },
 	{ route: "my-zites", component: MyZites },
 	{ route: "import-zite", component: ImportZite },
