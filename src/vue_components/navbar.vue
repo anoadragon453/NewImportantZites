@@ -2,6 +2,8 @@
 	<div>
 		<ul id="userDropdown" class="dropdown-content">
 			<li><a href="./?/" v-on:click.prevent="goto('')">{{ langTranslation["Home"] }}</a></li>
+			<li><a href="./?/total-search" v-on:click.prevent="goto('total-search')">{{ langTranslation["Total Search"] }}</a></li>
+			<li class="divider"></li>
 			<li v-for="link in userLinks" v-if="isLoggedIn">
 				<a :href="'./?/' + link.route" v-on:click.prevent="navbarLinkClick(link)">{{ link.name }}</a>
 			</li>
@@ -32,6 +34,8 @@
 					</ul>
 					<ul id="mobile-nav" class="sidenav">
 						<li><a href="./?/" v-on:click.prevent="goto('')">{{ langTranslation["Home"] }}</a></li>
+						<li><a href="./?/total-search" v-on:click.prevent="goto('total-search')">{{ langTranslation["Total Search"] }}</a></li>
+						<li class="divider"></li>
 						<li v-for="link in navbarLinksLeft">
 							<a :href="'./?/' + link.route" v-on:click.prevent="navbarLinkClick(link)">{{ link.name }}</a>
 						</li>
