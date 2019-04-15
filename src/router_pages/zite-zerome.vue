@@ -137,7 +137,7 @@
                         //{ col: "date_added", score: 1 }
                     ],
                     table: "post",
-                    join: "LEFT JOIN json USING (json_id)",
+                    join: "INNER JOIN json USING (json_id)",
                     page: self.pageNum,
                     afterOrderBy: "date_added DESC",
                     limit: 12

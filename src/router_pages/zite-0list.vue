@@ -130,7 +130,7 @@
                         { col: "added", score: 1 }
                     ],
                     table: "topic",
-                    join: "LEFT JOIN json USING (json_id)",
+                    join: "INNER JOIN json USING (json_id)",
                     page: self.pageNum,
                     afterOrderBy: "added DESC",
                     limit: 12

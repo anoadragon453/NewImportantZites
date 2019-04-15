@@ -117,7 +117,7 @@
                         //{ col: "date_updated", score: 1 }
                     ],
                     table: "article",
-                    join: "LEFT JOIN json USING (json_id)",
+                    join: "INNER JOIN json USING (json_id)",
                     where: "json.site = 'merged-Kiwipedia' AND json.directory LIKE '17FjMvAGAWAHxUohzk5HEq5EgjoCXnXV19/%'", // Only support En hub
                     page: self.pageNum,
                     //afterOrderBy: "date_updated DESC",

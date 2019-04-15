@@ -147,7 +147,7 @@
                         { col: "added", score: 1 }
                     ],
                     table: "topic",
-                    join: "LEFT JOIN json USING (json_id)",
+                    join: "INNER JOIN json USING (json_id)",
                     page: self.pageNum,
                     afterOrderBy: "added DESC",
                     limit: 4
@@ -197,7 +197,7 @@
                         { col: "description", score: 2 }
                     ],
                     table: "site",
-                    join: "LEFT JOIN json USING (json_id)",
+                    join: "INNER JOIN json USING (json_id)",
                     page: self.pageNum,
                     afterOrderBy: "date_added DESC",
                     limit: 4
@@ -245,7 +245,7 @@
                         { col: "date_added", score: 1 }
                     ],
                     table: "file",
-                    join: "LEFT JOIN json USING (json_id)",
+                    join: "INNER JOIN json USING (json_id)",
                     page: self.pageNum,
                     afterOrderBy: "date_added DESC",
                     limit: 3

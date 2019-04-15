@@ -150,7 +150,7 @@ class ZeroApp extends ZeroFrame {
 	}
 
 	selectUser() {
-		return this.cmdp("certSelect", { accepted_domains: ["zeroid.bit", "kaffie.bit", "cryptoid.bit", "peak.id"] });
+		return this.cmdp("certSelect", { accepted_domains: ["zeroid.bit", "kxoid.bit", "kaffie.bit", "cryptoid.bit", "peak.id"] });
     }
 
     signout() {
@@ -230,7 +230,7 @@ class ZeroApp extends ZeroFrame {
 		
 		var query = `
 			SELECT * FROM bookmark_categories
-			LEFT JOIN json USING (json_id)
+			INNER JOIN json USING (json_id)
 			WHERE directory='users/${app.userInfo.auth_address}'
 			`;
 		//console.log(query);
@@ -242,7 +242,7 @@ class ZeroApp extends ZeroFrame {
 			SELECT *
 				${app.userInfo && app.userInfo.auth_address ? ", (" + this.subQueryBookmarks() + ")" : ""}
 			FROM zites
-			LEFT JOIN json USING (json_id)
+			INNER JOIN json USING (json_id)
 			WHERE id=${id} AND json.directory='users/${auth_address}'
 			LIMIT 1
 			`;
@@ -253,7 +253,7 @@ class ZeroApp extends ZeroFrame {
 		var query = `
 			SELECT *
 			FROM zites
-			LEFT JOIN json USING (json_id)
+			INNER JOIN json USING (json_id)
 			WHERE address='${address}'
 			LIMIT 1
 			`;
@@ -266,7 +266,7 @@ class ZeroApp extends ZeroFrame {
 			SELECT *
 				${app.userInfo && app.userInfo.auth_address ? ", " + this.subQueryBookmarks() : ""}
 			FROM zites
-			LEFT JOIN json USING (json_id)
+			INNER JOIN json USING (json_id)
 			LIMIT ${limit}
 			OFFSET ${offset}
 			`;
@@ -279,7 +279,7 @@ class ZeroApp extends ZeroFrame {
 			SELECT *
 				${app.userInfo && app.userInfo.auth_address ? ", " + this.subQueryBookmarks() : ""}
 			FROM zites
-			LEFT JOIN json USING (json_id)
+			INNER JOIN json USING (json_id)
 			WHERE category_slug="${categorySlug}"
 			LIMIT ${limit}
 			OFFSET ${offset}
@@ -293,7 +293,7 @@ class ZeroApp extends ZeroFrame {
 			SELECT *
 				${app.userInfo && app.userInfo.auth_address ? ", (" + this.subQueryBookmarks() + ") AS bookmarkCount" : ""}
 			FROM zites
-			LEFT JOIN json USING (json_id)
+			INNER JOIN json USING (json_id)
 				${app.userInfo && app.userInfo.auth_address ? "WHERE bookmarkCount >= 1" : ""}
 			${limit ? "LIMIT " + limit : ""}
 			${limit ? "OFFSET " + offset : ""}
@@ -311,7 +311,7 @@ class ZeroApp extends ZeroFrame {
 			categoryWhere = " AND bookmarks.category_id=" + bookmarkCategoryId;
 		}
 		var s = `
-			SELECT DISTINCT COUNT(*) FROM bookmarks LEFT JOIN json AS bookmarksjson USING (json_id) WHERE zites.id=bookmarks.reference_id AND bookmarksjson.directory='users/${app.userInfo.auth_address}' ${categoryWhere}
+			SELECT DISTINCT COUNT(*) FROM bookmarks INNER JOIN json AS bookmarksjson USING (json_id) WHERE zites.id=bookmarks.reference_id AND bookmarksjson.directory='users/${app.userInfo.auth_address}' ${categoryWhere}
 			`;
 		return s;
 	}
@@ -334,7 +334,7 @@ class ZeroApp extends ZeroFrame {
 				{ skip: !app.userInfo || !app.userInfo.auth_address, col: "bookmarkCount", select: this.subQueryBookmarks(), inSearchMatchesAdded: false, inSearchMatchesOrderBy: true, score: 6 } // TODO: Rename inSearchMatchesAdded, and isSearchMatchesOrderBy
 			],
 			table: "zites",
-			join: "LEFT JOIN json USING (json_id)",
+			join: "INNER JOIN json USING (json_id)",
 			where: languageWhere,
 			page: pageNum,
 			afterOrderBy: "date_added ASC",
@@ -372,14 +372,14 @@ class ZeroApp extends ZeroFrame {
 			// When not logged in, push up, in the results, the zites that are in the same language as the client but still display the zites that aren't in the same language (they'd just be lower in list)
 			searchSelects.push({
 				col: "langCount",
-				select: `SELECT DISTINCT COUNT(*) FROM zites AS langzites LEFT JOIN json AS langjson USING (json_id) WHERE zites.id=langzites.id AND (langzites.languages LIKE '${app.serverInfo.language.toUpperCase()}' OR langzites.languages LIKE '${app.serverInfo.language.toUpperCase()},%' OR langzites.languages LIKE '%,${app.serverInfo.language.toUpperCase()}' OR langzites.languages LIKE '%,${app.serverInfo.language.toUpperCase()},%')`,
+				select: `SELECT DISTINCT COUNT(*) FROM zites AS langzites INNER JOIN json AS langjson USING (json_id) WHERE zites.id=langzites.id AND (langzites.languages LIKE '${app.serverInfo.language.toUpperCase()}' OR langzites.languages LIKE '${app.serverInfo.language.toUpperCase()},%' OR langzites.languages LIKE '%,${app.serverInfo.language.toUpperCase()}' OR langzites.languages LIKE '%,${app.serverInfo.language.toUpperCase()},%')`,
 				isSearchMatchesAdded: false,
 				isSearchMatchesOrderBy: true,
 				score: 1
 			});
 			searchSelects.push({
 				col: "langCount2",
-				select: `SELECT DISTINCT COUNT(*) FROM zites AS langzites LEFT JOIN json AS langjson USING (json_id) WHERE zites.id=langzites.id AND (langzites.languages LIKE '${app.serverInfo.language.toUpperCase()}')`,
+				select: `SELECT DISTINCT COUNT(*) FROM zites AS langzites INNER JOIN json AS langjson USING (json_id) WHERE zites.id=langzites.id AND (langzites.languages LIKE '${app.serverInfo.language.toUpperCase()}')`,
 				isSearchMatchesAdded: false,
 				isSearchMatchesOrderBy: true,
 				score: 1
@@ -391,7 +391,7 @@ class ZeroApp extends ZeroFrame {
 			select: "*",
 			searchSelects: searchSelects,
 			table: "zites",
-			join: "LEFT JOIN json USING (json_id)",
+			join: "INNER JOIN json USING (json_id)",
 			where: languageWhere,
 			page: pageNum,
 			afterOrderBy: "date_added ASC",
@@ -430,7 +430,7 @@ class ZeroApp extends ZeroFrame {
 			],
 			table: "zites",
 			where: "category_slug='" + categorySlug + "'" + languageWhere,
-			join: "LEFT JOIN json USING (json_id)",
+			join: "INNER JOIN json USING (json_id)",
 			afterOrderBy: "date_added ASC",
 			page: pageNum,
 			limit: limit
@@ -461,7 +461,7 @@ class ZeroApp extends ZeroFrame {
 			],
 			table: "zites",
 			where: "directory='users/" + app.userInfo.auth_address + "'",
-			join: "LEFT JOIN json USING (json_id)",
+			join: "INNER JOIN json USING (json_id)",
 			afterOrderBy: "date_added ASC",
 			page: pageNum,
 			limit: limit
@@ -500,7 +500,7 @@ class ZeroApp extends ZeroFrame {
 			],
 			table: "zites",
 			where: (app.userInfo && app.userInfo.auth_address ? "bookmarkCount >= 1" : "") + myZitesCategoryWhere,
-			join: "LEFT JOIN json USING (json_id)",
+			join: "INNER JOIN json USING (json_id)",
 			afterOrderBy: "date_added ASC",
 			page: pageNum,
 			limit: limit

@@ -167,8 +167,8 @@
                         //{ col: "added", score: 1 }
                     ],
                     table: "topic",
-                    join: `LEFT JOIN json USING (json_id)
-                        LEFT JOIN json AS topic_creator_content ON (topic_creator_content.directory = json.directory AND topic_creator_content.file_name = 'content.json')
+                    join: `INNER JOIN json USING (json_id)
+                        INNER JOIN json AS topic_creator_content ON (topic_creator_content.directory = json.directory AND topic_creator_content.file_name = 'content.json')
                         LEFT JOIN keyvalue AS topic_creator_user ON (topic_creator_user.json_id = topic_creator_content.json_id AND topic_creator_user.key = 'cert_user_id')
                         LEFT JOIN comment ON (comment.topic_uri = row_topic_uri AND comment.added < ${Date.now()/1000+120})`,
                     page: self.pageNum,
